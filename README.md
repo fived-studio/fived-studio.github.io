@@ -1,47 +1,102 @@
 # fived-studio.github.io
 
-The public landing page for **FiveD Studio**, served at <https://fived-studio.github.io>.
+The public site for **FiveD Studio**, served at <https://fived-studio.github.io>
+(eventually <https://fived.studio>). Frontend for **FiveD Pulse** — the live
+engineering platform aggregating every team member's full GitHub footprint.
 
 ## Stack
 
-Plain HTML + CSS. No build step, no framework, no JS bundle. Just edit and push.
+Next.js 15 (App Router) · React 19 · static export · GitHub Pages.
+
+The page is fully static at build-time. Live data (the activity ticker, member
+events) comes from the **Pulse API** (`api.fived.studio`) at runtime via fetch
++ Server-Sent Events. If the Pulse API is unreachable, the page degrades to
+sensible defaults — it never breaks.
+
+## Layout
 
 ```
 .
-├── index.html      # the page
-├── styles.css      # all styles
-├── favicon.svg     # 5D mark
-└── README.md
+├── app/
+│   ├── layout.tsx                # html shell, fonts, OG metadata
+│   ├── page.tsx                  # home (hero, products, principles, team)
+│   ├── globals.css               # design tokens + components
+│   ├── m/[username]/page.tsx     # /m/{login} — per-member portfolio page
+│   ├── live/page.tsx             # /live — full live feed
+│   └── wrapped/page.tsx          # /wrapped — quarterly archive (stub)
+├── components/
+│   └── LiveTicker.tsx            # SSE-driven live activity component
+├── lib/
+│   └── api.ts                    # Pulse API client
+├── public/
+│   └── favicon.svg
+├── next.config.js                # static export configured here
+└── .github/workflows/deploy.yml  # builds + deploys to Pages on push
 ```
 
 ## Develop locally
 
-Open `index.html` directly in a browser, or serve it:
+```bash
+pnpm install
+pnpm dev
+```
+
+Hot reload at http://localhost:3000.
+
+To point at a local Pulse backend (default is `https://api.fived.studio`):
 
 ```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
+NEXT_PUBLIC_PULSE_API=http://localhost:8787 pnpm dev
+```
+
+## Build & preview the static export
+
+```bash
+pnpm build              # outputs to ./out/
+npx serve out/          # preview the deploy artifact
 ```
 
 ## Deploy
 
-GitHub Pages auto‑publishes from `main`. To enable (one‑time):
+Pages publishes from a GitHub Actions workflow (not "deploy from a branch"). On
+push to `main` the workflow builds `out/` and deploys it.
 
-1. Push to `main` on this repo.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, set **Source = Deploy from a branch**, **Branch = main / (root)**.
-4. Save. The site goes live at `https://fived-studio.github.io` within a minute.
+**One-time switch in repo settings:**
 
-(Optional) For a custom domain like `fived.studio`:
+1. Settings → Pages → Source = **GitHub Actions** (was: "Deploy from a branch").
+2. Add a repo variable `PULSE_API_URL` if the Pulse API lives somewhere other
+   than `https://api.fived.studio`.
 
-1. Add a `CNAME` file at the repo root containing `fived.studio`.
-2. Configure DNS at your registrar:
-   - `A` records to GitHub Pages IPs (`185.199.108.153`, `.109.153`, `.110.153`, `.111.153`)
-   - or `CNAME` `www` → `fived-studio.github.io`
-3. Enable HTTPS in Settings → Pages.
+## Custom domain
 
-## Editing tips
+To serve at `fived.studio`:
 
-- Update the products in `index.html` under `#products` when repos change.
-- Team avatars come from `https://github.com/<username>.png` — no asset hosting needed.
-- Tweak the gradient palette in `styles.css` (`--accent`, `--accent-2`, `--accent-3`).
+1. Buy the domain.
+2. Add `public/CNAME` containing `fived.studio` (Next.js copies `public/` into
+   the build).
+3. Configure DNS at your registrar (`A` records to GitHub Pages IPs or `CNAME`
+   `www` → `fived-studio.github.io`).
+4. Enable HTTPS in Settings → Pages.
+
+## Adding a new team member
+
+1. Add their GitHub login to `KNOWN_MEMBERS` in `app/m/[username]/page.tsx` so
+   the static export pre-renders their page.
+2. Add them to `FALLBACK_MEMBERS` in `app/page.tsx` so the home page works
+   before the Pulse API knows about them.
+3. Onboard them in Pulse (OAuth flow → `members` table → optional GitHub App
+   install on their personal account). Once they're in Pulse, the API reflects
+   them automatically.
+
+## Pulse API contract (read-only, public)
+
+All endpoints listed in [Pulse README](../pulse/README.md). Used by this site:
+
+- `GET /v1/members` — team list
+- `GET /v1/members/:login` — single member with recent events
+- `GET /v1/events?limit=50` — org-wide event feed
+- `GET /v1/totals?days=30` — rollup numbers
+- `GET /v1/stream/events` (SSE) — live activity push
+
+If you change the API contract, `lib/api.ts` is the only place that consumes
+it on this side.

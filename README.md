@@ -8,10 +8,16 @@ engineering platform aggregating every team member's full GitHub footprint.
 
 Next.js 15 (App Router) · React 19 · static export · GitHub Pages.
 
-The page is fully static at build-time. Live data (the activity ticker, member
-events) comes from the **Pulse API** (`api.fived.studio`) at runtime via fetch
-+ Server-Sent Events. If the Pulse API is unreachable, the page degrades to
-sensible defaults — it never breaks.
+## MVP status
+
+The site ships **without** any backend dependency — every route renders fully
+static content. The Pulse API client (`lib/api.ts`) and `LiveTicker` component
+are scaffolded and ready, but currently unused. Files contain `TODO(pulse):`
+markers at every wire-up point — `grep -rn "TODO(pulse)" app components lib`
+to see them all.
+
+Once the Pulse backend (sibling repo `~/Documents/Code/pulse/`) is deployed,
+flipping each `TODO(pulse)` switch turns the static page into a live one.
 
 ## Layout
 

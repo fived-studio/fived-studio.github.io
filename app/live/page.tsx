@@ -1,23 +1,14 @@
 import Link from "next/link";
-import LiveTicker from "~/components/LiveTicker";
-import { pulse, type ActivityEvent } from "~/lib/api";
 
 export const metadata = {
-  title: "Live — FiveD Studio",
-  description: "Real-time engineering activity across the FiveD Studio team.",
+  title: "Live — coming soon · FiveD Studio",
+  description: "Real-time engineering activity across the FiveD Studio team. Coming soon.",
 };
 
-async function loadInitial(): Promise<ActivityEvent[]> {
-  try {
-    const r = await pulse.events(50);
-    return r.data;
-  } catch {
-    return [];
-  }
-}
-
-export default async function LivePage() {
-  const initial = await loadInitial();
+// TODO(pulse): this page is a deliberate placeholder until the Pulse backend
+// is live. The full implementation (LiveTicker w/ SSE) is wired in
+// components/LiveTicker.tsx and lib/api.ts — just import and render it here.
+export default function LivePage() {
   return (
     <>
       <header className="nav">
@@ -32,22 +23,23 @@ export default async function LivePage() {
       </header>
 
       <main>
-        <section className="section" style={{ paddingTop: 64 }}>
-          <header className="section-head">
-            <span className="eyebrow">
-              <span className="dot" />
-              Live activity
-            </span>
-            <h1 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", marginTop: 24 }}>
-              Watch us ship.
-            </h1>
-            <p style={{ color: "var(--text-dim)", marginTop: 12 }}>
-              Every push, PR, review, and release across the team — live.
-            </p>
-          </header>
-
-          <div style={{ maxWidth: 800, margin: "0 auto" }}>
-            <LiveTicker initial={initial} max={50} />
+        <section className="section" style={{ paddingTop: 96, textAlign: "center" }}>
+          <span className="eyebrow">
+            <span className="dot" />
+            Coming soon
+          </span>
+          <h1 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", marginTop: 24 }}>
+            Watch us ship — soon.
+          </h1>
+          <p style={{ color: "var(--text-dim)", marginTop: 12, maxWidth: 560, margin: "12px auto 0" }}>
+            Pulse — our live activity backend — is being built. When it&rsquo;s up, every push, PR,
+            review, and release across the team will land here within seconds of happening on GitHub.
+          </p>
+          <div className="cta-row center" style={{ marginTop: 32 }}>
+            <Link className="btn btn-primary" href="/">← Back to home</Link>
+            <a className="btn btn-ghost" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
           </div>
         </section>
       </main>

@@ -1,22 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { pulse, type Member, type ActivityEvent } from "~/lib/api";
 
-const KNOWN_MEMBERS = ["hgbaooo", "nquynqthanq", "thvnhtai", "sloweyyy", "TrTueTah"];
+// TODO(pulse): once the Pulse API is live, fetch real data via
+// `pulse.member(username)` from `~/lib/api`. Until then this page renders a
+// static profile pulled from MEMBERS + GitHub's avatar URL convention.
+const MEMBERS = {
+  hgbaooo: { name: "Huỳnh Gia Bảo", role: "Fullstack Engineer" },
+  nquynqthanq: { name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX" },
+  thvnhtai: { name: "Nguyễn Thành Tài", role: "Frontend · UI/UX" },
+  sloweyyy: { name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
+  TrTueTah: { name: "Trần Tuệ Tánh", role: "Fullstack Engineer" },
+} as const;
 
-// For static export — pre-render only known members. New members require a rebuild.
+type Username = keyof typeof MEMBERS;
+
 export function generateStaticParams() {
-  return KNOWN_MEMBERS.map((username) => ({ username }));
-}
-
-type Data = (Member & { recentEvents: ActivityEvent[] }) | null;
-
-async function load(username: string): Promise<Data> {
-  try {
-    return await pulse.member(username);
-  } catch {
-    return null;
-  }
+  return Object.keys(MEMBERS).map((username) => ({ username }));
 }
 
 export default async function MemberPage({
@@ -25,17 +24,8 @@ export default async function MemberPage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  if (!KNOWN_MEMBERS.includes(username)) notFound();
-
-  const member = await load(username);
-  const fallback = !member;
-  const display = member ?? {
-    login: username,
-    name: username,
-    role: null,
-    avatarUrl: `https://github.com/${username}.png`,
-    recentEvents: [],
-  };
+  if (!(username in MEMBERS)) notFound();
+  const member = MEMBERS[username as Username];
 
   return (
     <>
@@ -46,7 +36,6 @@ export default async function MemberPage({
         </Link>
         <nav>
           <Link href="/">Home</Link>
-          <Link href="/live">Live</Link>
           <Link href="/wrapped/">Wrapped</Link>
         </nav>
       </header>
@@ -55,18 +44,18 @@ export default async function MemberPage({
         <section className="section" style={{ paddingTop: 64 }}>
           <div className="member-hero">
             <img
-              src={display.avatarUrl ?? `https://github.com/${username}.png`}
-              alt={display.name}
+              src={`https://github.com/${username}.png`}
+              alt={member.name}
               width={120}
               height={120}
               style={{ borderRadius: "50%", border: "2px solid var(--border-hi)" }}
             />
             <div>
               <h1 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", marginBottom: 8 }}>
-                {display.name}
+                {member.name}
               </h1>
               <p style={{ color: "var(--text-dim)", fontSize: "1.05rem" }}>
-                {display.role ?? "Engineer at FiveD Studio"} ·{" "}
+                {member.role} ·{" "}
                 <a
                   href={`https://github.com/${username}`}
                   target="_blank"
@@ -76,39 +65,45 @@ export default async function MemberPage({
                   @{username}
                 </a>
               </p>
-              {fallback && (
-                <p style={{ color: "var(--text-mute)", fontSize: "0.85rem", marginTop: 8 }}>
-                  (Showing minimal profile — Pulse API not reachable.)
-                </p>
-              )}
             </div>
           </div>
         </section>
 
+        {/* TODO(pulse): replace this placeholder with real recent activity from
+            GET /v1/members/:login/events once Pulse is live. The renderer is
+            already in place — see the previous commit's version of this file. */}
         <section className="section">
           <header className="section-head">
-            <h2>Recent activity</h2>
-            <p>Last 20 events across every repo, anywhere on GitHub.</p>
-          </header>
-          {display.recentEvents.length === 0 ? (
-            <p style={{ textAlign: "center", color: "var(--text-mute)" }}>
-              No activity ingested yet — connect Pulse and webhooks to populate.
+            <h2>Activity</h2>
+            <p>
+              Soon: every push, PR, review, and release this engineer makes — across the FiveD org
+              and every public repo they touch on GitHub.
             </p>
-          ) : (
-            <ul className="event-list">
-              {display.recentEvents.map((e) => (
-                <li key={e.id}>
-                  <span className="event-summary">{e.summary}</span>
-                  <time dateTime={e.occurredAt}>{new Date(e.occurredAt).toLocaleString()}</time>
-                </li>
-              ))}
-            </ul>
-          )}
+          </header>
+          <p style={{ textAlign: "center", color: "var(--text-mute)", maxWidth: 480, margin: "0 auto" }}>
+            Pulse — our live activity backend — is coming online. Until then, see this engineer&rsquo;s
+            full footprint on{" "}
+            <a
+              href={`https://github.com/${username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "var(--accent)" }}
+            >
+              their GitHub profile
+            </a>
+            .
+          </p>
         </section>
 
         <section className="section contact">
           <h2>Embed this on your GitHub README</h2>
-          <p>Drop this badge into your profile README — it updates live.</p>
+          <p>
+            Once Pulse is live, drop this badge into your profile README — it will update
+            automatically.
+          </p>
+          {/* TODO(pulse): the SVG endpoint at /badge/:login.svg lives in the
+              backend but isn't deployed yet. Until then, this is a copy-paste
+              preview of the future markdown. */}
           <pre
             style={{
               padding: 20,
@@ -123,7 +118,7 @@ export default async function MemberPage({
               overflowX: "auto",
             }}
           >
-            {`[![${display.name} on FiveD Pulse](https://api.fived.studio/badge/${username}.svg)](https://fived.studio/m/${username})`}
+            {`[![${member.name} on FiveD Pulse](https://api.fived.studio/badge/${username}.svg)](https://fived-studio.github.io/m/${username})`}
           </pre>
         </section>
       </main>

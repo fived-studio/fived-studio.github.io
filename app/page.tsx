@@ -1,39 +1,17 @@
 import Link from "next/link";
-import LiveTicker from "~/components/LiveTicker";
-import { pulse, type ActivityEvent, type Member, type Totals } from "~/lib/api";
 
-const FALLBACK_MEMBERS: Member[] = [
-  { login: "hgbaooo", name: "Huỳnh Gia Bảo", role: "Fullstack Engineer", avatarUrl: null },
-  { login: "nquynqthanq", name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX", avatarUrl: null },
-  { login: "thvnhtai", name: "Nguyễn Thành Tài", role: "Frontend · UI/UX", avatarUrl: null },
-  { login: "sloweyyy", name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack", avatarUrl: null },
-  { login: "TrTueTah", name: "Trần Tuệ Tánh", role: "Fullstack Engineer", avatarUrl: null },
+// TODO(pulse): once api.fived.studio is live, replace MEMBERS with
+// `await pulse.members()` and surface live totals/events. See lib/api.ts and
+// components/LiveTicker.tsx — both are wired and ready, just unlinked.
+const MEMBERS = [
+  { login: "hgbaooo", name: "Huỳnh Gia Bảo", role: "Fullstack Engineer" },
+  { login: "nquynqthanq", name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX" },
+  { login: "thvnhtai", name: "Nguyễn Thành Tài", role: "Frontend · UI/UX" },
+  { login: "sloweyyy", name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
+  { login: "TrTueTah", name: "Trần Tuệ Tánh", role: "Fullstack Engineer" },
 ];
 
-async function loadInitial(): Promise<{
-  members: Member[];
-  events: ActivityEvent[];
-  totals: Totals | null;
-}> {
-  try {
-    const [members, evs, totals] = await Promise.all([
-      pulse.members(),
-      pulse.events(5).then((r) => r.data),
-      pulse.totals(30),
-    ]);
-    return {
-      members: members.length ? members : FALLBACK_MEMBERS,
-      events: evs,
-      totals,
-    };
-  } catch {
-    return { members: FALLBACK_MEMBERS, events: [], totals: null };
-  }
-}
-
-export default async function Page() {
-  const { members, events, totals } = await loadInitial();
-
+export default function Page() {
   return (
     <>
       <header className="nav">
@@ -45,7 +23,6 @@ export default async function Page() {
           <Link href="#products">Products</Link>
           <Link href="#principles">How we work</Link>
           <Link href="#team">Team</Link>
-          <Link href="/live">Live</Link>
           <Link href="/wrapped/">Wrapped</Link>
           <a className="nav-cta" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
             GitHub →
@@ -71,35 +48,21 @@ export default async function Page() {
             companies. By night we ship our own products — for coffee shops, resorts, and the
             long tail of internet commerce.
           </p>
-
-          <div style={{ marginTop: 28 }}>
-            <LiveTicker initial={events} max={5} />
-          </div>
-
-          <div className="cta-row" style={{ marginTop: 28 }}>
+          <div className="cta-row">
             <Link className="btn btn-primary" href="#products">See what we ship</Link>
             <a className="btn btn-ghost" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
               View on GitHub
             </a>
           </div>
 
+          {/* TODO(pulse): replace these static stats with live numbers from
+              GET /v1/totals?days=30 once the API is up. See <LiveTicker /> +
+              lib/api.ts for the wired client. */}
           <div className="stats">
-            <div>
-              <strong>{totals?.total ?? "—"}</strong>
-              <span>events · 30d</span>
-            </div>
-            <div>
-              <strong>{totals?.prsMerged ?? "—"}</strong>
-              <span>PRs merged</span>
-            </div>
-            <div>
-              <strong>{totals?.reposTouched ?? members.length}</strong>
-              <span>repos touched</span>
-            </div>
-            <div>
-              <strong>{totals?.activeMembers ?? members.length}</strong>
-              <span>engineers active</span>
-            </div>
+            <div><strong>5</strong><span>engineers</span></div>
+            <div><strong>4+</strong><span>products live</span></div>
+            <div><strong>2022</strong><span>since</span></div>
+            <div><strong>SGN</strong><span>HQ</span></div>
           </div>
         </section>
 
@@ -171,13 +134,9 @@ export default async function Page() {
             </p>
           </header>
           <div className="team-grid">
-            {members.map((m) => (
+            {MEMBERS.map((m) => (
               <Link key={m.login} className="member" href={`/m/${m.login}/`}>
-                <img
-                  src={m.avatarUrl ?? `https://github.com/${m.login}.png`}
-                  alt={m.name}
-                  loading="lazy"
-                />
+                <img src={`https://github.com/${m.login}.png`} alt={m.name} loading="lazy" />
                 <strong>{m.name}</strong>
                 <span>{m.role}</span>
               </Link>

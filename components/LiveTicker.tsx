@@ -1,5 +1,10 @@
 "use client";
 
+// TODO(pulse): wired but UNUSED in the current MVP. Once the Pulse backend is
+// deployed at NEXT_PUBLIC_PULSE_API, import and render this on `/` and `/live`
+// to show realtime activity via SSE. Don't delete — see the prior commit's
+// page.tsx for the integration shape, and lib/api.ts for the read endpoints.
+
 import { useEffect, useRef, useState } from "react";
 import { pulse, type ActivityEvent } from "~/lib/api";
 

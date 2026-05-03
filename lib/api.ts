@@ -1,10 +1,13 @@
 /**
- * Pulse API client. Reads come from `api.fived.studio` (or local dev override).
- * Live updates come from the SSE endpoint, opened by components that mount on
- * the client.
+ * Pulse API client.
  *
- * All read methods are safe to call from server components — Next.js will
- * fetch + revalidate per the per-call options.
+ * TODO(pulse): UNUSED in the current MVP — kept as the canonical client for
+ * when the backend at api.fived.studio is deployed. See ../../pulse/ for the
+ * service implementation. The current pages render static content; this file
+ * is here so the wire-up is a one-liner per page when the time comes.
+ *
+ * Reads will come from `api.fived.studio` (or NEXT_PUBLIC_PULSE_API in dev).
+ * Live updates come from the SSE endpoint, opened by client components.
  */
 
 const BASE = process.env.NEXT_PUBLIC_PULSE_API ?? "https://api.fived.studio";

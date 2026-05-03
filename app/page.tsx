@@ -21,11 +21,11 @@ export default function Page() {
         </Link>
         <nav>
           <Link href="#products">Products</Link>
-          <Link href="#principles">How we work</Link>
+          <Link href="#principles">Principles</Link>
           <Link href="#team">Team</Link>
           <Link href="/wrapped/">Wrapped</Link>
           <a className="nav-cta" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
-            GitHub →
+            github →
           </a>
         </nav>
       </header>
@@ -41,13 +41,38 @@ export default function Page() {
             <br />
             One studio.
             <br />
-            <span className="grad">Software that ships.</span>
+            <span className="accent">Software that ships.</span>
           </h1>
           <p className="lede">
             A small product studio from Saigon. By day we build platforms at enterprise SaaS
             companies. By night we ship our own products — for coffee shops, resorts, and the
             long tail of internet commerce.
           </p>
+
+          <div className="code-block">
+            <div className="code-block-head">
+              <span className="code-block-dots">
+                <span /><span /><span />
+              </span>
+              <span>~ /fived-studio</span>
+            </div>
+            <pre>
+              <code>
+                <span className="prompt">$</span>
+                <span className="arg">git log --author=&quot;@fived-studio&quot; --since=&quot;30 days&quot;</span>
+                {"\n"}
+                <span className="comment"># 5 engineers · 4 products · 0 days off · live at fived.studio</span>
+                {"\n"}
+                {"\n"}
+                <span className="prompt">$</span>
+                <span className="arg">curl -s https://api.fived.studio/v1/totals?days=30</span>
+                {"\n"}
+                <span className="comment"># soon — live engineering pulse via Server-Sent Events</span>
+                {"\n"}
+              </code>
+            </pre>
+          </div>
+
           <div className="cta-row">
             <Link className="btn btn-primary" href="#products">See what we ship</Link>
             <a className="btn btn-ghost" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
@@ -56,8 +81,7 @@ export default function Page() {
           </div>
 
           {/* TODO(pulse): replace these static stats with live numbers from
-              GET /v1/totals?days=30 once the API is up. See <LiveTicker /> +
-              lib/api.ts for the wired client. */}
+              GET /v1/totals?days=30 once the API is up. */}
           <div className="stats">
             <div><strong>5</strong><span>engineers</span></div>
             <div><strong>4+</strong><span>products live</span></div>
@@ -100,7 +124,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section id="principles" className="section principles">
+        <section id="principles" className="section">
           <header className="section-head">
             <h2>How we operate</h2>
             <p>The defaults we keep coming back to.</p>
@@ -158,8 +182,12 @@ export default function Page() {
 
       <footer>
         <div className="footer-row">
-          <span>© {new Date().getFullYear()} FiveD Studio</span>
-          <span>Made with caffeine in Ho Chi Minh City ☕</span>
+          <span>© {new Date().getFullYear()} FiveD Studio · Saigon</span>
+          <span>
+            <a href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
+              github.com/fived-studio
+            </a>
+          </span>
         </div>
       </footer>
     </>

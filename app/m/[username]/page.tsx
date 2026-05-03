@@ -27,6 +27,8 @@ export default async function MemberPage({
   if (!(username in MEMBERS)) notFound();
   const member = MEMBERS[username as Username];
 
+  const badge = `[![${member.name} on FiveD Pulse](https://api.fived.studio/badge/${username}.svg)](https://fived-studio.github.io/m/${username})`;
+
   return (
     <>
       <header className="nav">
@@ -41,28 +43,41 @@ export default async function MemberPage({
       </header>
 
       <main>
-        <section className="section" style={{ paddingTop: 64 }}>
+        <section className="section" style={{ paddingTop: 96 }}>
           <div className="member-hero">
             <img
               src={`https://github.com/${username}.png`}
               alt={member.name}
               width={120}
               height={120}
-              style={{ borderRadius: "50%", border: "2px solid var(--border-hi)" }}
+              style={{ borderRadius: "50%", border: "1px solid var(--border)" }}
             />
             <div>
-              <h1 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", marginBottom: 8 }}>
+              <span className="eyebrow" style={{ marginBottom: 16 }}>
+                <span className="dot" />
+                @{username}
+              </span>
+              <h1
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(2rem, 4vw, 2.75rem)",
+                  fontWeight: 400,
+                  letterSpacing: "-0.65px",
+                  lineHeight: 1.05,
+                  margin: "16px 0 12px",
+                }}
+              >
                 {member.name}
               </h1>
-              <p style={{ color: "var(--text-dim)", fontSize: "1.05rem" }}>
+              <p style={{ color: "var(--text-dim)", fontSize: "0.95rem" }}>
                 {member.role} ·{" "}
                 <a
                   href={`https://github.com/${username}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "var(--accent)" }}
+                  style={{ color: "var(--accent)", fontFamily: "var(--font-mono)" }}
                 >
-                  @{username}
+                  github.com/{username}
                 </a>
               </p>
             </div>
@@ -70,8 +85,7 @@ export default async function MemberPage({
         </section>
 
         {/* TODO(pulse): replace this placeholder with real recent activity from
-            GET /v1/members/:login/events once Pulse is live. The renderer is
-            already in place — see the previous commit's version of this file. */}
+            GET /v1/members/:login/events once Pulse is live. */}
         <section className="section">
           <header className="section-head">
             <h2>Activity</h2>
@@ -80,46 +94,56 @@ export default async function MemberPage({
               and every public repo they touch on GitHub.
             </p>
           </header>
-          <p style={{ textAlign: "center", color: "var(--text-mute)", maxWidth: 480, margin: "0 auto" }}>
-            Pulse — our live activity backend — is coming online. Until then, see this engineer&rsquo;s
-            full footprint on{" "}
-            <a
-              href={`https://github.com/${username}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "var(--accent)" }}
-            >
-              their GitHub profile
-            </a>
-            .
-          </p>
-        </section>
-
-        <section className="section contact">
-          <h2>Embed this on your GitHub README</h2>
-          <p>
-            Once Pulse is live, drop this badge into your profile README — it will update
-            automatically.
-          </p>
-          {/* TODO(pulse): the SVG endpoint at /badge/:login.svg lives in the
-              backend but isn't deployed yet. Until then, this is a copy-paste
-              preview of the future markdown. */}
-          <pre
+          <div
             style={{
-              padding: 20,
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              borderRadius: 12,
-              maxWidth: 720,
-              margin: "20px auto 0",
+              maxWidth: 600,
+              margin: "0 auto",
+              padding: "32px 28px",
+              border: "1px dashed var(--border-dashed)",
+              borderRadius: "var(--r-card)",
+              textAlign: "center",
+              fontFamily: "var(--font-mono)",
               fontSize: "0.85rem",
-              fontFamily: "JetBrains Mono, monospace",
-              color: "var(--text-dim)",
-              overflowX: "auto",
+              color: "var(--text-mute)",
             }}
           >
-            {`[![${member.name} on FiveD Pulse](https://api.fived.studio/badge/${username}.svg)](https://fived-studio.github.io/m/${username})`}
-          </pre>
+            <div style={{ color: "var(--accent)", marginBottom: 8 }}>$ pulse status</div>
+            <div>Pulse backend not yet deployed.</div>
+            <div style={{ marginTop: 12 }}>
+              See full footprint at{" "}
+              <a
+                href={`https://github.com/${username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--accent)" }}
+              >
+                github.com/{username}
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section className="section">
+          <header className="section-head">
+            <h2>Embed on your README</h2>
+            <p>
+              When Pulse is live, paste this badge into your GitHub profile README — it updates
+              automatically with your live stats.
+            </p>
+          </header>
+          {/* TODO(pulse): the SVG endpoint at /badge/:login.svg lives in the
+              backend but isn't deployed yet. */}
+          <div className="code-block" style={{ maxWidth: 720 }}>
+            <div className="code-block-head">
+              <span className="code-block-dots">
+                <span /><span /><span />
+              </span>
+              <span>README.md</span>
+            </div>
+            <pre>
+              <code>{badge}</code>
+            </pre>
+          </div>
         </section>
       </main>
 
@@ -127,7 +151,7 @@ export default async function MemberPage({
         <div className="footer-row">
           <span>© {new Date().getFullYear()} FiveD Studio</span>
           <span>
-            <Link href="/">← Home</Link>
+            <Link href="/">← back to studio</Link>
           </span>
         </div>
       </footer>

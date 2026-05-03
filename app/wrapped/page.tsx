@@ -20,25 +20,50 @@ export default function WrappedArchive() {
       </header>
 
       <main>
-        <section className="section" style={{ paddingTop: 64 }}>
-          <header className="section-head">
-            <h1 style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}>FiveD Wrapped</h1>
-            <p style={{ color: "var(--text-dim)", marginTop: 12 }}>
-              Every quarter, an AI reads everything we shipped and writes the story.
-            </p>
-          </header>
+        <section className="section" style={{ paddingTop: 128, textAlign: "center" }}>
+          <span className="eyebrow">
+            <span className="dot" />
+            Quarterly
+          </span>
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2.25rem, 5vw, 3.25rem)",
+              fontWeight: 400,
+              letterSpacing: "-0.65px",
+              lineHeight: 1.05,
+              margin: "28px 0 20px",
+            }}
+          >
+            FiveD <span className="accent" style={{ color: "var(--accent)" }}>Wrapped</span>
+          </h1>
+          <p style={{ color: "var(--text-dim)", maxWidth: 560, margin: "0 auto", fontSize: "1rem", lineHeight: 1.65 }}>
+            Every quarter, an AI reads everything we shipped and writes the story. Custom titles
+            for every engineer, repo highlights, speed records, inside jokes — mined from real
+            commit data, narrated, archived forever.
+          </p>
 
-          <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
-            <p style={{ color: "var(--text-mute)", fontSize: "1rem" }}>
-              No Wrappeds published yet. The first one drops at the end of Q3 2026.
-            </p>
-            <p style={{ color: "var(--text-mute)", fontSize: "0.85rem", marginTop: 32 }}>
-              Want a preview? Watch the{" "}
-              <Link href="/live" style={{ color: "var(--accent)" }}>
-                live feed
-              </Link>{" "}
-              while we work.
-            </p>
+          <div className="code-block" style={{ marginTop: 40 }}>
+            <div className="code-block-head">
+              <span className="code-block-dots">
+                <span /><span /><span />
+              </span>
+              <span>archive ~ /wrapped</span>
+            </div>
+            <pre>
+              <code>
+                <span className="prompt">$</span>
+                <span className="arg">ls /wrapped/</span>
+                {"\n"}
+                <span className="comment"># empty. the first wrapped drops at the end of Q3 2026.</span>
+                {"\n"}
+              </code>
+            </pre>
+          </div>
+
+          <div className="cta-row center" style={{ marginTop: 40 }}>
+            <Link className="btn btn-primary" href="/live">Watch live →</Link>
+            <Link className="btn btn-ghost" href="/">← Back to studio</Link>
           </div>
         </section>
       </main>
@@ -47,7 +72,7 @@ export default function WrappedArchive() {
         <div className="footer-row">
           <span>© {new Date().getFullYear()} FiveD Studio</span>
           <span>
-            <Link href="/">← Home</Link>
+            <Link href="/">← back to studio</Link>
           </span>
         </div>
       </footer>

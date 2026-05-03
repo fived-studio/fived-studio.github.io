@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#0b0b0f",
+  themeColor: "#050507",
 };
 
 export const metadata: Metadata = {
@@ -29,13 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         />
       </head>
       <body>
-        <div className="grid-bg" aria-hidden="true" />
-        <div className="glow glow-1" aria-hidden="true" />
-        <div className="glow glow-2" aria-hidden="true" />
+        <div className="dot-bg" aria-hidden="true" />
         {children}
       </body>
     </html>

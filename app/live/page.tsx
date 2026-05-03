@@ -23,20 +23,50 @@ export default function LivePage() {
       </header>
 
       <main>
-        <section className="section" style={{ paddingTop: 96, textAlign: "center" }}>
+        <section className="section" style={{ paddingTop: 128, textAlign: "center" }}>
           <span className="eyebrow">
             <span className="dot" />
             Coming soon
           </span>
-          <h1 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", marginTop: 24 }}>
-            Watch us ship — soon.
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2.25rem, 5vw, 3.25rem)",
+              fontWeight: 400,
+              letterSpacing: "-0.65px",
+              lineHeight: 1.05,
+              margin: "28px 0 20px",
+            }}
+          >
+            Watch us ship — <span className="accent" style={{ color: "var(--accent)" }}>soon</span>.
           </h1>
-          <p style={{ color: "var(--text-dim)", marginTop: 12, maxWidth: 560, margin: "12px auto 0" }}>
+          <p style={{ color: "var(--text-dim)", maxWidth: 560, margin: "0 auto", fontSize: "1rem", lineHeight: 1.65 }}>
             Pulse — our live activity backend — is being built. When it&rsquo;s up, every push, PR,
             review, and release across the team will land here within seconds of happening on GitHub.
           </p>
-          <div className="cta-row center" style={{ marginTop: 32 }}>
-            <Link className="btn btn-primary" href="/">← Back to home</Link>
+
+          <div className="code-block" style={{ marginTop: 40 }}>
+            <div className="code-block-head">
+              <span className="code-block-dots">
+                <span /><span /><span />
+              </span>
+              <span>live ~ /v1/stream/events</span>
+            </div>
+            <pre>
+              <code>
+                <span className="prompt">$</span>
+                <span className="arg">curl -N https://api.fived.studio/v1/stream/events</span>
+                {"\n"}
+                <span className="comment"># SSE stream — every git event from the studio, live</span>
+                {"\n"}
+                <span className="comment"># status: building. ETA: M1 (week 3–4 of the Pulse roadmap)</span>
+                {"\n"}
+              </code>
+            </pre>
+          </div>
+
+          <div className="cta-row center" style={{ marginTop: 40 }}>
+            <Link className="btn btn-primary" href="/">← Back to studio</Link>
             <a className="btn btn-ghost" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
               GitHub
             </a>
@@ -48,7 +78,7 @@ export default function LivePage() {
         <div className="footer-row">
           <span>© {new Date().getFullYear()} FiveD Studio</span>
           <span>
-            <Link href="/">← Home</Link>
+            <Link href="/">← back to studio</Link>
           </span>
         </div>
       </footer>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pulse } from "~/lib/api";
 import LiveTicker from "~/components/LiveTicker";
+import LiveStats from "~/components/LiveStats";
 
 export const metadata = {
   title: "Live · FiveD Studio",
@@ -53,28 +54,7 @@ export default async function LivePage() {
             </p>
           </div>
 
-          <div className="live-stats">
-            <div>
-              <strong>{totals?.total ?? 0}</strong>
-              <span>events / 30d</span>
-            </div>
-            <div>
-              <strong>{totals?.prsMerged ?? 0}</strong>
-              <span>PRs merged</span>
-            </div>
-            <div>
-              <strong>{totals?.pushes ?? 0}</strong>
-              <span>pushes</span>
-            </div>
-            <div>
-              <strong>{totals?.reviews ?? 0}</strong>
-              <span>reviews</span>
-            </div>
-            <div>
-              <strong>{totals?.activeMembers ?? members.length}</strong>
-              <span>{totals?.activeMembers ? "active" : "members"}</span>
-            </div>
-          </div>
+          <LiveStats initial={totals} fallbackMembers={members.length} />
 
           <div className="live-feed">
             <div className="live-feed-head">

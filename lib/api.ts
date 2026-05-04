@@ -41,10 +41,9 @@ export type Totals = {
 };
 
 async function get<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    next: { revalidate: 30 },
-    ...init,
-  });
+  // No-store: pages re-fetch fresh on every navigation. We're a static export,
+  // so Next's revalidate hint is ignored — caching belongs to the browser.
+  const res = await fetch(`${BASE}${path}`, { cache: "no-store", ...init });
   if (!res.ok) throw new Error(`pulse api ${path} → ${res.status}`);
   return (await res.json()) as T;
 }

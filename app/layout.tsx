@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "FiveD Studio",
     description: "Five engineers. One studio. Software that ships.",
     url: "https://fived-studio.github.io",
-    images: [{ url: "/og.png" }],
+    // og image is generated per-route by app/**/opengraph-image.tsx
   },
   twitter: { card: "summary_large_image" },
 };

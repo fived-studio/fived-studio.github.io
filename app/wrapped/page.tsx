@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SiteHeader from "~/components/SiteHeader";
 
 export const metadata = {
   title: "Wrapped — FiveD Studio",
@@ -8,16 +9,7 @@ export const metadata = {
 export default function WrappedArchive() {
   return (
     <>
-      <header className="nav">
-        <Link href="/" className="brand">
-          <span className="logo">5D</span>
-          <span className="brand-name">FiveD Studio</span>
-        </Link>
-        <nav>
-          <Link href="/">Home</Link>
-          <Link href="/live">Live</Link>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main>
         <section className="section" style={{ paddingTop: 128, textAlign: "center" }}>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { pulse } from "~/lib/api";
 import LiveTicker from "~/components/LiveTicker";
 import LiveStats from "~/components/LiveStats";
+import SiteHeader from "~/components/SiteHeader";
 
 export const metadata = {
   title: "Live · FiveD Studio",
@@ -20,19 +21,7 @@ export default async function LivePage() {
 
   return (
     <>
-      <header className="nav">
-        <Link href="/" className="brand">
-          <span className="logo">5D</span>
-          <span className="brand-name">FiveD Studio</span>
-        </Link>
-        <nav>
-          <Link href="/">Home</Link>
-          <Link href="/wrapped/">Wrapped</Link>
-          <a className="nav-cta" href="https://github.com/fived-studio/pulse" target="_blank" rel="noopener noreferrer">
-            pulse →
-          </a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main>
         <section className="section live-section">

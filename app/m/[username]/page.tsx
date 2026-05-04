@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import SiteHeader from "~/components/SiteHeader";
 
 // TODO(pulse): once the Pulse API is live, fetch real data via
 // `pulse.member(username)` from `~/lib/api`. Until then this page renders a
@@ -31,16 +32,7 @@ export default async function MemberPage({
 
   return (
     <>
-      <header className="nav">
-        <Link href="/" className="brand">
-          <span className="logo">5D</span>
-          <span className="brand-name">FiveD Studio</span>
-        </Link>
-        <nav>
-          <Link href="/">Home</Link>
-          <Link href="/wrapped/">Wrapped</Link>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main>
         <section className="section" style={{ paddingTop: 96 }}>

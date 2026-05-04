@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SiteHeader from "~/components/SiteHeader";
 
 // TODO(pulse): once api.fived.studio is live, replace MEMBERS with
 // `await pulse.members()` and surface live totals/events. See lib/api.ts and
@@ -14,21 +15,7 @@ const MEMBERS = [
 export default function Page() {
   return (
     <>
-      <header className="nav">
-        <Link href="/" className="brand">
-          <span className="logo">5D</span>
-          <span className="brand-name">FiveD Studio</span>
-        </Link>
-        <nav>
-          <Link href="#products">Products</Link>
-          <Link href="#principles">Principles</Link>
-          <Link href="#team">Team</Link>
-          <Link href="/wrapped/">Wrapped</Link>
-          <a className="nav-cta" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
-            github →
-          </a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main>
         <section className="hero">

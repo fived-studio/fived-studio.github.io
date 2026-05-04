@@ -52,9 +52,10 @@ export const pulse = {
     get<{ data: Member & { recentEvents: ActivityEvent[] } }>(`/v1/members/${login}`).then(
       (r) => r.data,
     ),
-  events: (limit = 50, member?: string) => {
+  events: (limit = 50, member?: string, before?: string) => {
     const params = new URLSearchParams({ limit: String(limit) });
     if (member) params.set("member", member);
+    if (before) params.set("before", before);
     return get<{ data: ActivityEvent[]; nextBefore: string | null }>(`/v1/events?${params}`);
   },
   totals: (days = 30) =>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "~/components/SiteHeader";
-import EventTimeline from "~/components/EventTimeline";
+import MemberActivity from "~/components/MemberActivity";
 import { pulse, type ActivityEvent } from "~/lib/api";
 
 // Static export pre-renders one HTML file per username at build time.
@@ -32,10 +32,14 @@ export default async function MemberPage({
   if (!(username in ROSTER)) notFound();
   const fallback = ROSTER[username as Username];
 
-  const [profile, events] = await Promise.all([
+  const [profile, eventsRes] = await Promise.all([
     pulse.member(username).catch(() => null),
-    pulse.events(20, username).then((r) => r.data).catch(() => [] as ActivityEvent[]),
+    pulse.events(20, username).catch(() => ({
+      data: [] as ActivityEvent[],
+      nextBefore: null as string | null,
+    })),
   ]);
+  const events = eventsRes.data;
 
   const name = profile?.name ?? fallback.name;
   const role = profile?.role ?? fallback.role;
@@ -98,7 +102,11 @@ export default async function MemberPage({
           </header>
 
           {events.length > 0 ? (
-            <EventTimeline events={events} />
+            <MemberActivity
+              username={username}
+              initialEvents={events}
+              initialNextBefore={eventsRes.nextBefore}
+            />
           ) : (
             <div
               style={{

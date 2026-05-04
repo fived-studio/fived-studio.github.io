@@ -28,7 +28,7 @@ jobs:
 
       - run: bun run build
         env:
-          NEXT_PUBLIC_PULSE_API: ${{ vars.PULSE_API_URL || 'https://api.fived.studio' }}
+          NEXT_PUBLIC_PULSE_API: ${{ vars.PULSE_API_URL }}
 
       - uses: actions/configure-pages@v5
 

@@ -40,7 +40,7 @@ export default async function MemberPage({
   const role = profile?.role ?? fallback.role;
   const avatarUrl = profile?.avatarUrl ?? `https://github.com/${username}.png`;
 
-  const badge = `[![${name} on FiveD Pulse](https://api.fived.studio/badge/${username}.svg)](https://fived-studio.github.io/m/${username})`;
+  const badge = `[![${name} on FiveD Pulse](${process.env.NEXT_PUBLIC_PULSE_API}/badge/${username}.svg)](https://fived-studio.github.io/m/${username})`;
 
   return (
     <>

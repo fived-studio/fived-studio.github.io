@@ -1,16 +1,12 @@
 /**
  * Pulse API client.
  *
- * TODO(pulse): UNUSED in the current MVP — kept as the canonical client for
- * when the backend at api.fived.studio is deployed. See ../../pulse/ for the
- * service implementation. The current pages render static content; this file
- * is here so the wire-up is a one-liner per page when the time comes.
- *
- * Reads will come from `api.fived.studio` (or NEXT_PUBLIC_PULSE_API in dev).
+ * BASE comes from NEXT_PUBLIC_PULSE_API at build time. CI supplies it from
+ * the PULSE_API_URL repo variable; local dev falls back to localhost.
  * Live updates come from the SSE endpoint, opened by client components.
  */
 
-const BASE = process.env.NEXT_PUBLIC_PULSE_API ?? "https://api.fived.studio";
+const BASE = process.env.NEXT_PUBLIC_PULSE_API ?? "http://localhost:8787";
 
 export type Member = {
   login: string;

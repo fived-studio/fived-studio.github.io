@@ -49,7 +49,7 @@ pnpm dev
 
 Hot reload at http://localhost:3000.
 
-To point at a local Pulse backend (default is `https://api.fived.studio`):
+To point at a local Pulse backend (default is the deployed Cloud Run service):
 
 ```bash
 NEXT_PUBLIC_PULSE_API=http://localhost:8787 pnpm dev
@@ -70,8 +70,9 @@ push to `main` the workflow builds `out/` and deploys it.
 **One-time switch in repo settings:**
 
 1. Settings → Pages → Source = **GitHub Actions** (was: "Deploy from a branch").
-2. Add a repo variable `PULSE_API_URL` if the Pulse API lives somewhere other
-   than `https://api.fived.studio`.
+2. Repo variable `PULSE_API_URL` overrides the build-time API base. Currently
+   set to the Cloud Run service URL — update it when `api.fived.studio` (or
+   another custom domain) is mapped onto the service.
 
 ## Custom domain
 

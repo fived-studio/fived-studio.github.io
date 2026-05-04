@@ -59,9 +59,9 @@ export default async function Page() {
                 {"\n"}
                 {"\n"}
                 <span className="prompt">$</span>
-                <span className="arg">curl -s https://api.fived.studio/v1/totals?days=30</span>
+                <span className="arg">curl -s {process.env.NEXT_PUBLIC_PULSE_API}/v1/totals?days=30</span>
                 {"\n"}
-                <span className="comment"># soon — live engineering pulse via Server-Sent Events</span>
+                <span className="comment"># live engineering pulse via Server-Sent Events</span>
                 {"\n"}
               </code>
             </pre>

@@ -5,7 +5,10 @@ const nextConfig = {
   images: { unoptimized: true },
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_PULSE_API: process.env.NEXT_PUBLIC_PULSE_API ?? "https://api.fived.studio",
+    // Set NEXT_PUBLIC_PULSE_API at build time. CI gets it from the
+    // PULSE_API_URL repo variable; for local dev `bun run dev` defaults
+    // to a localhost backend.
+    NEXT_PUBLIC_PULSE_API: process.env.NEXT_PUBLIC_PULSE_API ?? "http://localhost:8787",
   },
 };
 

@@ -1,14 +1,23 @@
 import Link from "next/link";
+import { pulse } from "~/lib/api";
+import LiveTicker from "~/components/LiveTicker";
 
 export const metadata = {
-  title: "Live — coming soon · FiveD Studio",
-  description: "Real-time engineering activity across the FiveD Studio team. Coming soon.",
+  title: "Live · FiveD Studio",
+  description: "Real-time engineering activity across the FiveD Studio team.",
 };
 
-// TODO(pulse): this page is a deliberate placeholder until the Pulse backend
-// is live. The full implementation (LiveTicker w/ SSE) is wired in
-// components/LiveTicker.tsx and lib/api.ts — just import and render it here.
-export default function LivePage() {
+// Static export: this runs at build time. Initial events are baked into the
+// HTML; the LiveTicker client component then opens an SSE connection and
+// streams new events into view.
+export const dynamic = "force-static";
+
+export default async function LivePage() {
+  const [events, totals] = await Promise.all([
+    pulse.events(20).then((r) => r.data).catch(() => []),
+    pulse.totals(30).catch(() => null),
+  ]);
+
   return (
     <>
       <header className="nav">
@@ -23,27 +32,35 @@ export default function LivePage() {
       </header>
 
       <main>
-        <section className="section" style={{ paddingTop: 128, textAlign: "center" }}>
-          <span className="eyebrow">
-            <span className="dot" />
-            Coming soon
-          </span>
-          <h1
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(2.25rem, 5vw, 3.25rem)",
-              fontWeight: 400,
-              letterSpacing: "-0.65px",
-              lineHeight: 1.05,
-              margin: "28px 0 20px",
-            }}
-          >
-            Watch us ship — <span className="accent" style={{ color: "var(--accent)" }}>soon</span>.
-          </h1>
-          <p style={{ color: "var(--text-dim)", maxWidth: 560, margin: "0 auto", fontSize: "1rem", lineHeight: 1.65 }}>
-            Pulse — our live activity backend — is being built. When it&rsquo;s up, every push, PR,
-            review, and release across the team will land here within seconds of happening on GitHub.
-          </p>
+        <section className="section" style={{ paddingTop: 96 }}>
+          <header className="section-head">
+            <span className="eyebrow">
+              <span className="dot" />
+              Live
+            </span>
+            <h2 style={{ marginTop: 16 }}>
+              Watch us ship — <span className="accent">in real time</span>.
+            </h2>
+            <p>
+              Every push, PR, review, and release across the team — within seconds of happening
+              on GitHub. Powered by{" "}
+              <a href="https://github.com/fived-studio/pulse" target="_blank" rel="noopener noreferrer">
+                Pulse
+              </a>
+              .
+            </p>
+          </header>
+
+          {totals ? (
+            <div className="stats" style={{ margin: "8px 0 24px" }}>
+              <div><strong>{totals.total}</strong><span>events / 30d</span></div>
+              <div><strong>{totals.prsMerged}</strong><span>PRs merged</span></div>
+              <div><strong>{totals.pushes}</strong><span>pushes</span></div>
+              <div><strong>{totals.activeMembers}</strong><span>active</span></div>
+            </div>
+          ) : null}
+
+          <LiveTicker initial={events} max={20} />
 
           <div className="code-block" style={{ marginTop: 40 }}>
             <div className="code-block-head">
@@ -55,11 +72,9 @@ export default function LivePage() {
             <pre>
               <code>
                 <span className="prompt">$</span>
-                <span className="arg">curl -N https://api.fived.studio/v1/stream/events</span>
+                <span className="arg">curl -N {process.env.NEXT_PUBLIC_PULSE_API}/v1/stream/events</span>
                 {"\n"}
                 <span className="comment"># SSE stream — every git event from the studio, live</span>
-                {"\n"}
-                <span className="comment"># status: building. ETA: M1 (week 3–4 of the Pulse roadmap)</span>
                 {"\n"}
               </code>
             </pre>

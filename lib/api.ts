@@ -58,8 +58,11 @@ export const pulse = {
     if (before) params.set("before", before);
     return get<{ data: ActivityEvent[]; nextBefore: string | null }>(`/v1/events?${params}`);
   },
-  totals: (days = 30) =>
-    get<{ data: Totals }>(`/v1/totals?days=${days}`).then((r) => r.data),
+  totals: (days = 30, member?: string) => {
+    const params = new URLSearchParams({ days: String(days) });
+    if (member) params.set("member", member);
+    return get<{ data: Totals }>(`/v1/totals?${params}`).then((r) => r.data);
+  },
   streamUrl: (member?: string) =>
     `${BASE}/v1/stream/events${member ? `?member=${encodeURIComponent(member)}` : ""}`,
 };

@@ -28,7 +28,7 @@ export default async function OG({
 
   const [profile, totals] = await Promise.all([
     pulse.member(username).catch(() => null),
-    pulse.totals(30).catch(() => null),
+    pulse.totals(30, username).catch(() => null),
   ]);
 
   const name = profile?.name ?? fallback.name;

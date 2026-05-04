@@ -1,10 +1,5 @@
 "use client";
 
-// TODO(pulse): wired but UNUSED in the current MVP. Once the Pulse backend is
-// deployed at NEXT_PUBLIC_PULSE_API, import and render this on `/` and `/live`
-// to show realtime activity via SSE. Don't delete — see the prior commit's
-// page.tsx for the integration shape, and lib/api.ts for the read endpoints.
-
 import { useEffect, useRef, useState } from "react";
 import { pulse, type ActivityEvent } from "~/lib/api";
 
@@ -15,9 +10,16 @@ type Props = {
 };
 
 export default function LiveTicker({ initial, member, max = 5 }: Props) {
-  const [events, setEvents] = useState<ActivityEvent[]>(initial.slice(0, max));
+  const [events, setEvents] = useState<ActivityEvent[]>(() => initial.slice(0, max));
   const [connected, setConnected] = useState(false);
   const esRef = useRef<EventSource | null>(null);
+
+  // Sync to parent's initial whenever it changes — e.g. when LiveFeed
+  // re-fetches after a filter chip is clicked. Without this, the filter
+  // appears to do nothing because state is frozen at first-mount.
+  useEffect(() => {
+    setEvents(initial.slice(0, max));
+  }, [initial, max]);
 
   useEffect(() => {
     const es = new EventSource(pulse.streamUrl(member));
@@ -30,15 +32,17 @@ export default function LiveTicker({ initial, member, max = 5 }: Props) {
         const data = JSON.parse((ev as MessageEvent).data) as Omit<ActivityEvent, "id"> & {
           id: string;
         };
-        setEvents((prev) => [
-          {
-            id: data.id,
-            type: data.type,
-            summary: data.summary,
-            occurredAt: data.occurredAt,
-          },
-          ...prev,
-        ].slice(0, max));
+        setEvents((prev) =>
+          [
+            {
+              id: data.id,
+              type: data.type,
+              summary: data.summary,
+              occurredAt: data.occurredAt,
+            },
+            ...prev.filter((e) => e.id !== data.id),
+          ].slice(0, max),
+        );
       } catch {}
     });
     es.onerror = () => setConnected(false);
@@ -46,6 +50,7 @@ export default function LiveTicker({ initial, member, max = 5 }: Props) {
     return () => {
       es.close();
       esRef.current = null;
+      setConnected(false);
     };
   }, [member, max]);
 

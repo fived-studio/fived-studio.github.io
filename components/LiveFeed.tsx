@@ -69,12 +69,7 @@ export default function LiveFeed({ initialEvents, members }: Props) {
             {refreshing ? "refreshing…" : "live"}
           </span>
         </div>
-        <LiveTicker
-          key={filter ?? "all"} /* re-mount on filter change to reset SSE + state */
-          initial={events}
-          member={filter ?? undefined}
-          max={20}
-        />
+        <LiveTicker initial={events} member={filter ?? undefined} max={20} />
       </div>
     </>
   );

@@ -25,7 +25,9 @@ export type ActivityEvent = {
   summary: string;
   occurredAt: string;
   memberId?: string | null;
+  memberLogin?: string | null;
   repoId?: string | null;
+  repoFullName?: string | null;
 };
 
 export type Totals = {
@@ -54,8 +56,11 @@ export const pulse = {
     get<{ data: Member & { recentEvents: ActivityEvent[] } }>(`/v1/members/${login}`).then(
       (r) => r.data,
     ),
-  events: (limit = 50) =>
-    get<{ data: ActivityEvent[]; nextBefore: string | null }>(`/v1/events?limit=${limit}`),
+  events: (limit = 50, member?: string) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (member) params.set("member", member);
+    return get<{ data: ActivityEvent[]; nextBefore: string | null }>(`/v1/events?${params}`);
+  },
   totals: (days = 30) =>
     get<{ data: Totals }>(`/v1/totals?days=${days}`).then((r) => r.data),
   streamUrl: (member?: string) =>

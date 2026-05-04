@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "~/components/SiteHeader";
+import { pulse, type ActivityEvent } from "~/lib/api";
 
-// TODO(pulse): once the Pulse API is live, fetch real data via
-// `pulse.member(username)` from `~/lib/api`. Until then this page renders a
-// static profile pulled from MEMBERS + GitHub's avatar URL convention.
-const MEMBERS = {
+// Static export pre-renders one HTML file per username at build time.
+// generateStaticParams must return synchronously, so we keep a fallback
+// roster here. Activity itself is fetched live per page.
+const ROSTER = {
   hgbaooo: { name: "Huỳnh Gia Bảo", role: "Fullstack Engineer" },
   nquynqthanq: { name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX" },
   thvnhtai: { name: "Nguyễn Thành Tài", role: "Frontend · UI/UX" },
@@ -13,10 +14,12 @@ const MEMBERS = {
   TrTueTah: { name: "Trần Tuệ Tánh", role: "Fullstack Engineer" },
 } as const;
 
-type Username = keyof typeof MEMBERS;
+type Username = keyof typeof ROSTER;
+
+export const dynamic = "force-static";
 
 export function generateStaticParams() {
-  return Object.keys(MEMBERS).map((username) => ({ username }));
+  return Object.keys(ROSTER).map((username) => ({ username }));
 }
 
 export default async function MemberPage({
@@ -25,10 +28,19 @@ export default async function MemberPage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  if (!(username in MEMBERS)) notFound();
-  const member = MEMBERS[username as Username];
+  if (!(username in ROSTER)) notFound();
+  const fallback = ROSTER[username as Username];
 
-  const badge = `[![${member.name} on FiveD Pulse](https://api.fived.studio/badge/${username}.svg)](https://fived-studio.github.io/m/${username})`;
+  const [profile, events] = await Promise.all([
+    pulse.member(username).catch(() => null),
+    pulse.events(20, username).then((r) => r.data).catch(() => [] as ActivityEvent[]),
+  ]);
+
+  const name = profile?.name ?? fallback.name;
+  const role = profile?.role ?? fallback.role;
+  const avatarUrl = profile?.avatarUrl ?? `https://github.com/${username}.png`;
+
+  const badge = `[![${name} on FiveD Pulse](https://api.fived.studio/badge/${username}.svg)](https://fived-studio.github.io/m/${username})`;
 
   return (
     <>
@@ -38,8 +50,8 @@ export default async function MemberPage({
         <section className="section" style={{ paddingTop: 96 }}>
           <div className="member-hero">
             <img
-              src={`https://github.com/${username}.png`}
-              alt={member.name}
+              src={avatarUrl}
+              alt={name}
               width={120}
               height={120}
               style={{ borderRadius: "50%", border: "1px solid var(--border)" }}
@@ -59,10 +71,10 @@ export default async function MemberPage({
                   margin: "16px 0 12px",
                 }}
               >
-                {member.name}
+                {name}
               </h1>
               <p style={{ color: "var(--text-dim)", fontSize: "0.95rem" }}>
-                {member.role} ·{" "}
+                {role} ·{" "}
                 <a
                   href={`https://github.com/${username}`}
                   target="_blank"
@@ -76,55 +88,62 @@ export default async function MemberPage({
           </div>
         </section>
 
-        {/* TODO(pulse): replace this placeholder with real recent activity from
-            GET /v1/members/:login/events once Pulse is live. */}
         <section className="section">
           <header className="section-head">
-            <h2>Activity</h2>
+            <h2>Recent activity</h2>
             <p>
-              Soon: every push, PR, review, and release this engineer makes — across the FiveD org
-              and every public repo they touch on GitHub.
+              Last {events.length || 0} events from {username} across the FiveD org.
             </p>
           </header>
-          <div
-            style={{
-              maxWidth: 600,
-              margin: "0 auto",
-              padding: "32px 28px",
-              border: "1px dashed var(--border-dashed)",
-              borderRadius: "var(--r-card)",
-              textAlign: "center",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.85rem",
-              color: "var(--text-mute)",
-            }}
-          >
-            <div style={{ color: "var(--accent)", marginBottom: 8 }}>$ pulse status</div>
-            <div>Pulse backend not yet deployed.</div>
-            <div style={{ marginTop: 12 }}>
-              See full footprint at{" "}
-              <a
-                href={`https://github.com/${username}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "var(--accent)" }}
-              >
-                github.com/{username}
-              </a>
+
+          {events.length > 0 ? (
+            <ul className="event-list">
+              {events.map((e) => (
+                <li key={e.id}>
+                  <span className="event-summary">{e.summary}</span>
+                  <time dateTime={e.occurredAt}>{relative(e.occurredAt)}</time>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div
+              style={{
+                maxWidth: 600,
+                margin: "0 auto",
+                padding: "32px 28px",
+                border: "1px dashed var(--border-dashed)",
+                borderRadius: "var(--r-card)",
+                textAlign: "center",
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.85rem",
+                color: "var(--text-mute)",
+              }}
+            >
+              <div style={{ color: "var(--accent)", marginBottom: 8 }}>$ pulse status</div>
+              <div>No events tracked yet for @{username}.</div>
+              <div style={{ marginTop: 12 }}>
+                See full footprint at{" "}
+                <a
+                  href={`https://github.com/${username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--accent)" }}
+                >
+                  github.com/{username}
+                </a>
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         <section className="section">
           <header className="section-head">
             <h2>Embed on your README</h2>
             <p>
-              When Pulse is live, paste this badge into your GitHub profile README — it updates
-              automatically with your live stats.
+              Paste this badge into your GitHub profile README — it updates automatically with
+              your live stats.
             </p>
           </header>
-          {/* TODO(pulse): the SVG endpoint at /badge/:login.svg lives in the
-              backend but isn't deployed yet. */}
           <div className="code-block" style={{ maxWidth: 720 }}>
             <div className="code-block-head">
               <span className="code-block-dots">
@@ -149,4 +168,16 @@ export default async function MemberPage({
       </footer>
     </>
   );
+}
+
+function relative(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  const s = Math.max(1, Math.round(ms / 1000));
+  if (s < 60) return `${s}s ago`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 48) return `${h}h ago`;
+  const d = Math.round(h / 24);
+  return `${d}d ago`;
 }

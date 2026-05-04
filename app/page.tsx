@@ -1,18 +1,25 @@
 import Link from "next/link";
 import SiteHeader from "~/components/SiteHeader";
+import { pulse, type Member } from "~/lib/api";
 
-// TODO(pulse): once api.fived.studio is live, replace MEMBERS with
-// `await pulse.members()` and surface live totals/events. See lib/api.ts and
-// components/LiveTicker.tsx — both are wired and ready, just unlinked.
-const MEMBERS = [
-  { login: "hgbaooo", name: "Huỳnh Gia Bảo", role: "Fullstack Engineer" },
-  { login: "nquynqthanq", name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX" },
-  { login: "thvnhtai", name: "Nguyễn Thành Tài", role: "Frontend · UI/UX" },
-  { login: "sloweyyy", name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
-  { login: "TrTueTah", name: "Trần Tuệ Tánh", role: "Fullstack Engineer" },
+// Static fallback if the API is unreachable at build time. The set is small
+// and stable — one row per founding engineer.
+const FALLBACK_MEMBERS: Member[] = [
+  { login: "hgbaooo", name: "Huỳnh Gia Bảo", role: "Fullstack Engineer", avatarUrl: null },
+  { login: "nquynqthanq", name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX", avatarUrl: null },
+  { login: "thvnhtai", name: "Nguyễn Thành Tài", role: "Frontend · UI/UX", avatarUrl: null },
+  { login: "sloweyyy", name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack", avatarUrl: null },
+  { login: "TrTueTah", name: "Trần Tuệ Tánh", role: "Fullstack Engineer", avatarUrl: null },
 ];
 
-export default function Page() {
+export const dynamic = "force-static";
+
+export default async function Page() {
+  const [apiMembers, totals] = await Promise.all([
+    pulse.members().catch(() => [] as Member[]),
+    pulse.totals(30).catch(() => null),
+  ]);
+  const members = apiMembers.length > 0 ? apiMembers : FALLBACK_MEMBERS;
   return (
     <>
       <SiteHeader />
@@ -67,13 +74,11 @@ export default function Page() {
             </a>
           </div>
 
-          {/* TODO(pulse): replace these static stats with live numbers from
-              GET /v1/totals?days=30 once the API is up. */}
           <div className="stats">
-            <div><strong>5</strong><span>engineers</span></div>
-            <div><strong>4+</strong><span>products live</span></div>
-            <div><strong>2022</strong><span>since</span></div>
-            <div><strong>SGN</strong><span>HQ</span></div>
+            <div><strong>{members.length}</strong><span>engineers</span></div>
+            <div><strong>{totals?.total ?? 0}</strong><span>events / 30d</span></div>
+            <div><strong>{totals?.prsMerged ?? 0}</strong><span>PRs merged</span></div>
+            <div><strong>{totals?.activeMembers ?? 0}</strong><span>shipping</span></div>
           </div>
         </section>
 
@@ -145,11 +150,11 @@ export default function Page() {
             </p>
           </header>
           <div className="team-grid">
-            {MEMBERS.map((m) => (
+            {members.map((m) => (
               <Link key={m.login} className="member" href={`/m/${m.login}/`}>
-                <img src={`https://github.com/${m.login}.png`} alt={m.name} loading="lazy" />
+                <img src={m.avatarUrl ?? `https://github.com/${m.login}.png`} alt={m.name} loading="lazy" />
                 <strong>{m.name}</strong>
-                <span>{m.role}</span>
+                <span>{m.role ?? ""}</span>
               </Link>
             ))}
           </div>

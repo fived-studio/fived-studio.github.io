@@ -7,16 +7,15 @@ export const metadata = {
   description: "Real-time engineering activity across the FiveD Studio team.",
 };
 
-// Static export: this runs at build time. Initial events are baked into the
-// HTML; the LiveTicker client component then opens an SSE connection and
-// streams new events into view.
 export const dynamic = "force-static";
 
 export default async function LivePage() {
-  const [events, totals] = await Promise.all([
-    pulse.events(20).then((r) => r.data).catch(() => []),
+  const [eventsRes, totals, members] = await Promise.all([
+    pulse.events(20).catch(() => ({ data: [], nextBefore: null })),
     pulse.totals(30).catch(() => null),
+    pulse.members().catch(() => []),
   ]);
+  const events = eventsRes.data;
 
   return (
     <>
@@ -28,20 +27,23 @@ export default async function LivePage() {
         <nav>
           <Link href="/">Home</Link>
           <Link href="/wrapped/">Wrapped</Link>
+          <a className="nav-cta" href="https://github.com/fived-studio/pulse" target="_blank" rel="noopener noreferrer">
+            pulse →
+          </a>
         </nav>
       </header>
 
       <main>
-        <section className="section" style={{ paddingTop: 96 }}>
-          <header className="section-head">
+        <section className="section live-section">
+          <div className="live-head">
             <span className="eyebrow">
               <span className="dot" />
-              Live
+              Live · SSE
             </span>
-            <h2 style={{ marginTop: 16 }}>
+            <h1>
               Watch us ship — <span className="accent">in real time</span>.
-            </h2>
-            <p>
+            </h1>
+            <p className="lede">
               Every push, PR, review, and release across the team — within seconds of happening
               on GitHub. Powered by{" "}
               <a href="https://github.com/fived-studio/pulse" target="_blank" rel="noopener noreferrer">
@@ -49,43 +51,51 @@ export default async function LivePage() {
               </a>
               .
             </p>
-          </header>
+          </div>
 
-          {totals ? (
-            <div className="stats" style={{ margin: "8px 0 24px" }}>
-              <div><strong>{totals.total}</strong><span>events / 30d</span></div>
-              <div><strong>{totals.prsMerged}</strong><span>PRs merged</span></div>
-              <div><strong>{totals.pushes}</strong><span>pushes</span></div>
-              <div><strong>{totals.activeMembers}</strong><span>active</span></div>
+          <div className="live-stats">
+            <div>
+              <strong>{totals?.total ?? 0}</strong>
+              <span>events / 30d</span>
             </div>
-          ) : null}
-
-          <LiveTicker initial={events} max={20} />
-
-          <div className="code-block" style={{ marginTop: 40 }}>
-            <div className="code-block-head">
-              <span className="code-block-dots">
-                <span /><span /><span />
-              </span>
-              <span>live ~ /v1/stream/events</span>
+            <div>
+              <strong>{totals?.prsMerged ?? 0}</strong>
+              <span>PRs merged</span>
             </div>
+            <div>
+              <strong>{totals?.pushes ?? 0}</strong>
+              <span>pushes</span>
+            </div>
+            <div>
+              <strong>{totals?.reviews ?? 0}</strong>
+              <span>reviews</span>
+            </div>
+            <div>
+              <strong>{totals?.activeMembers ?? members.length}</strong>
+              <span>{totals?.activeMembers ? "active" : "members"}</span>
+            </div>
+          </div>
+
+          <div className="live-feed">
+            <div className="live-feed-head">
+              <span className="live-feed-title">Activity feed</span>
+              <span className="live-feed-meta">last 20 · auto-updating</span>
+            </div>
+            <LiveTicker initial={events} max={20} />
+          </div>
+
+          <details className="live-curl">
+            <summary>Stream it yourself</summary>
             <pre>
               <code>
-                <span className="prompt">$</span>
-                <span className="arg">curl -N {process.env.NEXT_PUBLIC_PULSE_API}/v1/stream/events</span>
+                <span className="prompt">$</span> curl -N \
+                {"\n  "}
+                {process.env.NEXT_PUBLIC_PULSE_API}/v1/stream/events
                 {"\n"}
-                <span className="comment"># SSE stream — every git event from the studio, live</span>
-                {"\n"}
+                <span className="comment"># SSE — every git event from the studio, live</span>
               </code>
             </pre>
-          </div>
-
-          <div className="cta-row center" style={{ marginTop: 40 }}>
-            <Link className="btn btn-primary" href="/">← Back to studio</Link>
-            <a className="btn btn-ghost" href="https://github.com/fived-studio" target="_blank" rel="noopener noreferrer">
-              GitHub
-            </a>
-          </div>
+          </details>
         </section>
       </main>
 

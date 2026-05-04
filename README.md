@@ -1,109 +1,118 @@
-# fived-studio.github.io
+<div align="center">
 
-The public site for **FiveD Studio**, served at <https://fived-studio.github.io>
-(eventually <https://fived.studio>). Frontend for **FiveD Pulse** — the live
-engineering platform aggregating every team member's full GitHub footprint.
+# FiveD Studio
+
+**The public site for [FiveD Studio](https://fived-studio.github.io)** — a small
+product studio out of Saigon. Live engineering pulse. Static-fast pages. Streamed
+real-time updates.
+
+[![Live site](https://img.shields.io/badge/live-fived--studio.github.io-00d992?style=flat-square)](https://fived-studio.github.io)
+[![Pages deploy](https://img.shields.io/github/actions/workflow/status/fived-studio/fived-studio.github.io/deploy.yml?branch=main&style=flat-square&label=deploy)](https://github.com/fived-studio/fived-studio.github.io/actions)
+[![Next.js 15](https://img.shields.io/badge/Next.js-15-000?style=flat-square&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript&logoColor=fff)](https://www.typescriptlang.org)
+
+</div>
+
+## Highlights
+
+- **Static-first.** Every page pre-renders to HTML at build time — instant first paint, hostable on any CDN.
+- **Live where it matters.** `/live` opens a Server-Sent Events stream to the [Pulse backend](https://github.com/fived-studio/pulse) and ticks new events into the feed within seconds of them happening on GitHub.
+- **One config switch from prod-grade.** `NEXT_PUBLIC_PULSE_API` is the only environment variable needed; CI plumbs it through automatically.
+- **Designed.** Carbon-black canvas, Signal-Green accent, mono-on-system typography. Tokenized in [`app/globals.css`](app/globals.css) — no Tailwind, no CSS-in-JS.
 
 ## Stack
 
-Next.js 15 (App Router) · React 19 · static export · GitHub Pages.
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 15 (App Router, RSC) |
+| Runtime | Bun |
+| Output | `next export` → static `out/` |
+| Hosting | GitHub Pages |
+| API client | Native `fetch` against the Pulse REST + SSE API |
 
-## MVP status
-
-The site ships **without** any backend dependency — every route renders fully
-static content. The Pulse API client (`lib/api.ts`) and `LiveTicker` component
-are scaffolded and ready, but currently unused. Files contain `TODO(pulse):`
-markers at every wire-up point — `grep -rn "TODO(pulse)" app components lib`
-to see them all.
-
-Once the Pulse backend (sibling repo `~/Documents/Code/pulse/`) is deployed,
-flipping each `TODO(pulse)` switch turns the static page into a live one.
-
-## Layout
-
-```
-.
-├── app/
-│   ├── layout.tsx                # html shell, fonts, OG metadata
-│   ├── page.tsx                  # home (hero, products, principles, team)
-│   ├── globals.css               # design tokens + components
-│   ├── m/[username]/page.tsx     # /m/{login} — per-member portfolio page
-│   ├── live/page.tsx             # /live — full live feed
-│   └── wrapped/page.tsx          # /wrapped — quarterly archive (stub)
-├── components/
-│   └── LiveTicker.tsx            # SSE-driven live activity component
-├── lib/
-│   └── api.ts                    # Pulse API client
-├── public/
-│   └── favicon.svg
-├── next.config.js                # static export configured here
-└── .github/workflows/deploy.yml  # builds + deploys to Pages on push
-```
-
-## Develop locally
+## Quick start
 
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 
-Hot reload at http://localhost:3000.
-
-To point at a local Pulse backend (default is the deployed Cloud Run service):
+Open <http://localhost:3000>. By default the dev server points at a Pulse
+backend at `http://localhost:8787`. Override with:
 
 ```bash
-NEXT_PUBLIC_PULSE_API=http://localhost:8787 pnpm dev
+NEXT_PUBLIC_PULSE_API=https://your-pulse-host bun run dev
 ```
 
-## Build & preview the static export
+## Production build
 
 ```bash
-pnpm build              # outputs to ./out/
-npx serve out/          # preview the deploy artifact
+bun run build       # → ./out/
+npx serve out/      # preview the deploy artefact locally
 ```
 
 ## Deploy
 
-Pages publishes from a GitHub Actions workflow (not "deploy from a branch"). On
-push to `main` the workflow builds `out/` and deploys it.
+CI deploys on every push to `main`. The workflow lives at
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 
-**One-time switch in repo settings:**
+One-time setup:
+1. **Settings → Pages → Source = GitHub Actions**.
+2. **Settings → Secrets and variables → Actions → Variables → New variable**
+   `PULSE_API_URL` = the deployed Pulse base URL.
 
-1. Settings → Pages → Source = **GitHub Actions** (was: "Deploy from a branch").
-2. Repo variable `PULSE_API_URL` overrides the build-time API base. Currently
-   set to the Cloud Run service URL — update it when `api.fived.studio` (or
-   another custom domain) is mapped onto the service.
+That's it. Push to `main`, watch the run, the new build is live ~60 seconds later.
 
-## Custom domain
+### Custom domain
 
-To serve at `fived.studio`:
+```bash
+echo "fived.studio" > public/CNAME
+```
 
-1. Buy the domain.
-2. Add `public/CNAME` containing `fived.studio` (Next.js copies `public/` into
-   the build).
-3. Configure DNS at your registrar (`A` records to GitHub Pages IPs or `CNAME`
-   `www` → `fived-studio.github.io`).
-4. Enable HTTPS in Settings → Pages.
+Then point `A` records at GitHub Pages IPs (or a `CNAME` for `www`) and enable
+HTTPS in Settings → Pages.
 
-## Adding a new team member
+## Project layout
 
-1. Add their GitHub login to `KNOWN_MEMBERS` in `app/m/[username]/page.tsx` so
-   the static export pre-renders their page.
-2. Add them to `FALLBACK_MEMBERS` in `app/page.tsx` so the home page works
-   before the Pulse API knows about them.
-3. Onboard them in Pulse (OAuth flow → `members` table → optional GitHub App
-   install on their personal account). Once they're in Pulse, the API reflects
-   them automatically.
+```
+app/                          # Next.js App Router
+  page.tsx                    # /         home (hero, products, principles, team)
+  live/page.tsx               # /live     real-time activity stream
+  wrapped/page.tsx            # /wrapped  quarterly archive (placeholder)
+  m/[username]/page.tsx       # /m/{login} per-member portfolio
+components/
+  SiteHeader.tsx              # shared nav
+  LiveTicker.tsx              # SSE client — streams pulse.event into a feed
+  LiveStats.tsx               # client-polled totals so static stats stay fresh
+lib/
+  api.ts                      # Pulse REST + SSE client (BASE = NEXT_PUBLIC_PULSE_API)
+.github/workflows/deploy.yml  # CI → Pages
+```
 
-## Pulse API contract (read-only, public)
+## Adding a team member
 
-All endpoints listed in [Pulse README](../pulse/README.md). Used by this site:
+1. Add the GitHub login + display name + role to `ROSTER` in `app/m/[username]/page.tsx`
+   (Next needs it at build time for `generateStaticParams`).
+2. Add the same row to `FALLBACK_MEMBERS` in `app/page.tsx` (used when the
+   API is unreachable at build time).
+3. Onboard them in Pulse — once they show up in `/v1/members`, both pages
+   prefer the live data.
 
-- `GET /v1/members` — team list
-- `GET /v1/members/:login` — single member with recent events
-- `GET /v1/events?limit=50` — org-wide event feed
-- `GET /v1/totals?days=30` — rollup numbers
-- `GET /v1/stream/events` (SSE) — live activity push
+## Pulse API surface
 
-If you change the API contract, `lib/api.ts` is the only place that consumes
-it on this side.
+This site consumes these read endpoints. Full contract in the
+[Pulse repository](https://github.com/fived-studio/pulse).
+
+| Method | Path | Used by |
+|---|---|---|
+| `GET` | `/v1/members` | `/`, `/m/[username]` (resolve display name + avatar) |
+| `GET` | `/v1/members/:login` | `/m/[username]` (recent events) |
+| `GET` | `/v1/events?member=&limit=` | `/m/[username]`, `/live` (initial fill) |
+| `GET` | `/v1/totals?days=` | `/`, `/live` (stats grid) |
+| `GET` | `/v1/stream/events` (SSE) | `/live` (live tick) |
+
+`lib/api.ts` is the only file that consumes the API; type changes start there.
+
+## License
+
+Proprietary. © FiveD Studio.

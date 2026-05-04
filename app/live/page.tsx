@@ -35,11 +35,8 @@ export default async function LivePage() {
             </h1>
             <p className="lede">
               Every push, PR, review, and release across the team — within seconds of happening
-              on GitHub. Powered by{" "}
-              <a href="https://github.com/fived-studio/pulse" target="_blank" rel="noopener noreferrer">
-                Pulse
-              </a>
-              .
+              on GitHub. Powered by Pulse —{" "}
+              <Link href="/about/">how it works</Link>.
             </p>
           </div>
 

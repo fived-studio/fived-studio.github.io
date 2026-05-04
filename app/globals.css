@@ -682,6 +682,35 @@ footer {
   color: var(--text-dim);
 }
 
+/* ---------- /live filter chips ---------- */
+.live-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+}
+.live-filter {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.live-filter:hover {
+  background: var(--surface-hi);
+  color: var(--text);
+}
+.live-filter.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* ---------- /live page ---------- */
 .live-section {
   max-width: 960px;

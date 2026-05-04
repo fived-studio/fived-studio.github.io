@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { pulse } from "~/lib/api";
-import LiveTicker from "~/components/LiveTicker";
+import LiveFeed from "~/components/LiveFeed";
 import LiveStats from "~/components/LiveStats";
 import SiteHeader from "~/components/SiteHeader";
 
@@ -45,13 +45,7 @@ export default async function LivePage() {
 
           <LiveStats initial={totals} fallbackMembers={members.length} />
 
-          <div className="live-feed">
-            <div className="live-feed-head">
-              <span className="live-feed-title">Activity feed</span>
-              <span className="live-feed-meta">last 20 · auto-updating</span>
-            </div>
-            <LiveTicker initial={events} max={20} />
-          </div>
+          <LiveFeed initialEvents={events} members={members} />
 
           <details className="live-curl">
             <summary>Stream it yourself</summary>

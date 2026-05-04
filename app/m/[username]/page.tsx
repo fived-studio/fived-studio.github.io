@@ -96,46 +96,32 @@ export default async function MemberPage({
         <section className="section">
           <header className="section-head">
             <h2>Recent activity</h2>
-            <p>
-              Last {events.length || 0} events from {username} across the FiveD org.
-            </p>
           </header>
 
-          {events.length > 0 ? (
-            <MemberActivity
-              username={username}
-              initialEvents={events}
-              initialNextBefore={eventsRes.nextBefore}
-            />
-          ) : (
-            <div
-              style={{
-                maxWidth: 600,
-                margin: "0 auto",
-                padding: "32px 28px",
-                border: "1px dashed var(--border-dashed)",
-                borderRadius: "var(--r-card)",
-                textAlign: "center",
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.85rem",
-                color: "var(--text-mute)",
-              }}
-            >
-              <div style={{ color: "var(--accent)", marginBottom: 8 }}>$ pulse status</div>
-              <div>No events tracked yet for @{username}.</div>
-              <div style={{ marginTop: 12 }}>
-                See full footprint at{" "}
+          <MemberActivity
+            username={username}
+            initialEvents={events}
+            initialNextBefore={eventsRes.nextBefore}
+          />
+          {/* keep a tiny piece for crawlers (the client component fills in
+              the real list at runtime) */}
+          {events.length === 0 ? (
+            <noscript>
+              <div className="member-empty">
+                <div className="member-empty-prompt">$ pulse status</div>
+                <div>{`See @${username} on `}
                 <a
                   href={`https://github.com/${username}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "var(--accent)" }}
                 >
-                  github.com/{username}
+                  {`github.com/${username}`}
                 </a>
+                </div>
               </div>
-            </div>
-          )}
+            </noscript>
+          ) : null}
         </section>
 
         <section className="section">

@@ -901,6 +901,31 @@ footer {
   white-space: nowrap;
 }
 
+/* ---------- member activity (live-fetched) ---------- */
+.member-activity-meta {
+  max-width: 760px;
+  margin: 0 auto 16px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-mute);
+  letter-spacing: 0.02em;
+}
+.member-empty {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px 28px;
+  border: 1px dashed var(--border-dashed);
+  border-radius: var(--r-card);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-mute);
+}
+.member-empty-prompt {
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
 /* ---------- load-more (member activity) ---------- */
 .load-more {
   display: flex;

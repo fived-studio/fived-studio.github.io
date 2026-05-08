@@ -10,6 +10,7 @@ export default function SiteHeader() {
       <nav>
         <Link href="/">Home</Link>
         <Link href="/live/">Live</Link>
+        <Link href="/leetcode/">LeetCode</Link>
         <a
           className="nav-cta"
           href="https://github.com/fived-studio"

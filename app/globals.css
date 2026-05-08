@@ -1111,3 +1111,280 @@ footer {
     border-bottom: none;
   }
 }
+
+/* ===== LeetCode page ===== */
+
+.lc-section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  margin: 0 0 24px;
+  color: var(--text-bright);
+}
+
+.lc-leaderboard {
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  overflow: hidden;
+  margin-top: 24px;
+}
+
+.lc-leaderboard-head,
+.lc-leaderboard-row {
+  display: grid;
+  grid-template-columns: 36px minmax(220px, 2fr) repeat(7, minmax(64px, 1fr));
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.lc-leaderboard-head {
+  background: var(--surface-hi);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+}
+
+.lc-leaderboard-row {
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+  transition: background 120ms ease;
+}
+
+.lc-leaderboard-row:first-of-type {
+  border-top: none;
+}
+
+.lc-leaderboard-row:hover {
+  background: var(--surface-hi);
+}
+
+.lc-rank {
+  color: var(--text-mute);
+  font-weight: 500;
+}
+
+.lc-engineer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.lc-engineer span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lc-engineer strong {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--text-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lc-handle {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.lc-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-easy {
+  color: #2fd6a1;
+}
+
+.lc-medium {
+  color: #ffb547;
+}
+
+.lc-hard {
+  color: #ff5c7c;
+}
+
+.lc-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+}
+
+.lc-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+}
+
+.lc-stat-card strong {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 500;
+  color: var(--text-bright);
+  line-height: 1.1;
+}
+
+.lc-stat-card .muted {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-mute);
+}
+
+.lc-stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mute);
+}
+
+/* ===== Heatmap ===== */
+
+.lc-heatmap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 18px 20px;
+  --lc-empty: #1a1c1f;
+  --lc-empty-stroke: #25272b;
+}
+
+.lc-heatmap-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.lc-heatmap-stats {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.lc-heatmap-stats strong {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-right: 4px;
+}
+
+.lc-heatmap-meta {
+  display: flex;
+  gap: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-mute);
+}
+
+.lc-heatmap-meta strong {
+  color: var(--text-bright);
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+.lc-heatmap-scroll {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.lc-heatmap-scroll svg {
+  display: block;
+}
+
+.lc-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-mute);
+  justify-content: flex-end;
+}
+
+.lc-heatmap-legend .lc-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.lc-heatmap-legend .lc-cell:first-of-type {
+  border: 1px solid var(--lc-empty-stroke, #25272b);
+}
+
+.lc-heatmap-list {
+  display: grid;
+  gap: 24px;
+}
+
+.lc-heatmap-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lc-heatmap-cardhead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lc-heatmap-cardhead a {
+  text-decoration: none;
+  color: var(--text-bright);
+}
+
+.lc-heatmap-cardhead strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.lc-heatmap-cardhead .muted {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-mute);
+}
+
+@media (max-width: 768px) {
+  .lc-leaderboard-head,
+  .lc-leaderboard-row {
+    grid-template-columns: 28px minmax(140px, 2fr) repeat(3, minmax(48px, 1fr));
+    font-size: 0.78rem;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  /* Hide easy/medium/hard/contest/streak columns on small screens — keep
+     rank, engineer, total, weighted, ranking */
+  .lc-leaderboard-head > :nth-child(n+4):nth-child(-n+6),
+  .lc-leaderboard-head > :nth-child(8),
+  .lc-leaderboard-head > :nth-child(9),
+  .lc-leaderboard-row > :nth-child(n+4):nth-child(-n+6),
+  .lc-leaderboard-row > :nth-child(8),
+  .lc-leaderboard-row > :nth-child(9) {
+    display: none;
+  }
+}

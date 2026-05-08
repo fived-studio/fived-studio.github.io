@@ -1369,6 +1369,101 @@ footer {
   color: var(--text-mute);
 }
 
+/* ===== Badges ===== */
+
+.lc-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.lc-badges-compact {
+  margin-top: 12px;
+}
+
+.lc-badge {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-button);
+  background: var(--surface-hi);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.lc-badge img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+}
+
+.lc-badge-more {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-mute);
+  padding: 0 8px;
+}
+
+.lc-badges-full {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lc-badge-group-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-bright);
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+
+.lc-badge-group-title .muted {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--text-mute);
+}
+
+.lc-badge-tile {
+  width: auto;
+  min-width: 96px;
+  max-width: 140px;
+  padding: 12px 10px 10px;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  text-align: center;
+}
+
+.lc-badge-tile img {
+  width: 44px;
+  height: 44px;
+}
+
+.lc-badge-name {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--text);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.lc-badge-date {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-mute);
+}
+
+.lc-badges-section {
+  margin-top: 24px;
+}
+
 @media (max-width: 768px) {
   .lc-leaderboard-head,
   .lc-leaderboard-row {

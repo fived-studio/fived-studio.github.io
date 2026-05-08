@@ -75,6 +75,14 @@ export const pulse = {
   },
 };
 
+export type LeetcodeBadge = {
+  id: string;
+  name: string;
+  icon: string;
+  category: string;
+  creationDate: string;
+};
+
 export type LeetcodeLeaderboardEntry = {
   rank: number;
   login: string;
@@ -91,6 +99,7 @@ export type LeetcodeLeaderboardEntry = {
   streak: number;
   totalActiveDays: number;
   weighted: number;
+  badges: LeetcodeBadge[] | null;
   fetchedAt: string;
   lastError: string | null;
 };
@@ -116,6 +125,7 @@ export type LeetcodeMemberStats = {
   totalActiveDays: number;
   submissionCalendar: Record<string, number>;
   languageStats: Array<{ languageName: string; problemsSolved: number }>;
+  badges: LeetcodeBadge[] | null;
   weighted: number;
   fetchedAt: string;
   lastError: string | null;

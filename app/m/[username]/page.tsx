@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import SiteHeader from "~/components/SiteHeader";
 import MemberActivity from "~/components/MemberActivity";
 import LeetcodeHeatmap from "~/components/LeetcodeHeatmap";
+import LeetcodeBadges from "~/components/LeetcodeBadges";
 import { pulse, type ActivityEvent, type LeetcodeMemberStats } from "~/lib/api";
 
 // Static export pre-renders one HTML file per username at build time.
@@ -181,6 +182,15 @@ export default async function MemberPage({
             </div>
 
             <LeetcodeHeatmap calendar={leetcode.submissionCalendar ?? {}} />
+
+            {leetcode.badges && leetcode.badges.length > 0 && (
+              <div className="lc-badges-section">
+                <h3 className="lc-section-title" style={{ fontSize: "1.1rem", marginTop: 24 }}>
+                  Badges <span className="muted">· {leetcode.badges.length}</span>
+                </h3>
+                <LeetcodeBadges badges={leetcode.badges} variant="full" />
+              </div>
+            )}
           </section>
         )}
 

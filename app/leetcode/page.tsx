@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "~/components/SiteHeader";
 import LeetcodeHeatmap from "~/components/LeetcodeHeatmap";
+import LeetcodeBadges from "~/components/LeetcodeBadges";
 import { pulse, type LeetcodeLeaderboardEntry, type LeetcodeMemberStats } from "~/lib/api";
 
 export const metadata = {
@@ -121,6 +122,7 @@ export default async function LeetcodePage() {
                       </div>
                     </header>
                     <LeetcodeHeatmap calendar={stat.submissionCalendar ?? {}} />
+                    <LeetcodeBadges badges={stat.badges} variant="compact" limit={20} />
                   </article>
                 );
               })}

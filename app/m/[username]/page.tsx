@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "~/components/SiteHeader";
 import MemberActivity from "~/components/MemberActivity";
-import { pulse, type ActivityEvent } from "~/lib/api";
+import LeetcodeHeatmap from "~/components/LeetcodeHeatmap";
+import { pulse, type ActivityEvent, type LeetcodeMemberStats } from "~/lib/api";
 
 // Static export pre-renders one HTML file per username at build time.
 // generateStaticParams must return synchronously, so we keep a fallback
@@ -32,12 +33,13 @@ export default async function MemberPage({
   if (!(username in ROSTER)) notFound();
   const fallback = ROSTER[username as Username];
 
-  const [profile, eventsRes] = await Promise.all([
+  const [profile, eventsRes, leetcode] = await Promise.all([
     pulse.member(username).catch(() => null),
     pulse.events(20, username).catch(() => ({
       data: [] as ActivityEvent[],
       nextBefore: null as string | null,
     })),
+    pulse.leetcode.member(username).catch(() => null as LeetcodeMemberStats | null),
   ]);
   const events = eventsRes.data;
 
@@ -123,6 +125,64 @@ export default async function MemberPage({
             </noscript>
           ) : null}
         </section>
+
+        {leetcode && leetcode.handle && !leetcode.lastError && (
+          <section className="section">
+            <header className="section-head">
+              <h2>LeetCode</h2>
+              <p>
+                Synced from{" "}
+                <a
+                  href={`https://leetcode.com/u/${leetcode.handle}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--accent)", fontFamily: "var(--font-mono)" }}
+                >
+                  @{leetcode.handle}
+                </a>
+                . See the{" "}
+                <Link href="/leetcode/" style={{ color: "var(--accent)" }}>team leaderboard</Link>.
+              </p>
+            </header>
+
+            <div className="lc-stat-grid">
+              <div className="lc-stat-card">
+                <span className="lc-stat-label">Total solved</span>
+                <strong>{leetcode.totalSolved}</strong>
+                <span className="muted">of {leetcode.totalEasy + leetcode.totalMedium + leetcode.totalHard}</span>
+              </div>
+              <div className="lc-stat-card">
+                <span className="lc-stat-label lc-easy">Easy</span>
+                <strong>{leetcode.easy}</strong>
+                <span className="muted">/ {leetcode.totalEasy}</span>
+              </div>
+              <div className="lc-stat-card">
+                <span className="lc-stat-label lc-medium">Medium</span>
+                <strong>{leetcode.medium}</strong>
+                <span className="muted">/ {leetcode.totalMedium}</span>
+              </div>
+              <div className="lc-stat-card">
+                <span className="lc-stat-label lc-hard">Hard</span>
+                <strong>{leetcode.hard}</strong>
+                <span className="muted">/ {leetcode.totalHard}</span>
+              </div>
+              <div className="lc-stat-card">
+                <span className="lc-stat-label">Global rank</span>
+                <strong>{leetcode.ranking?.toLocaleString() ?? "—"}</strong>
+                {leetcode.contestRating != null && (
+                  <span className="muted">contest {leetcode.contestRating}</span>
+                )}
+              </div>
+              <div className="lc-stat-card">
+                <span className="lc-stat-label">Weighted</span>
+                <strong>{leetcode.weighted}</strong>
+                <span className="muted">E×1 + M×2 + H×4</span>
+              </div>
+            </div>
+
+            <LeetcodeHeatmap calendar={leetcode.submissionCalendar ?? {}} />
+          </section>
+        )}
 
         <section className="section">
           <header className="section-head">

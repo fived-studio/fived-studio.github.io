@@ -65,4 +65,58 @@ export const pulse = {
   },
   streamUrl: (member?: string) =>
     `${BASE}/v1/stream/events${member ? `?member=${encodeURIComponent(member)}` : ""}`,
+  leetcode: {
+    leaderboard: (sort: "weighted" | "total" | "ranking" | "contest" = "weighted") =>
+      get<{ data: { sort: string; count: number; leaderboard: LeetcodeLeaderboardEntry[] } }>(
+        `/v1/leetcode/leaderboard?sort=${sort}`,
+      ).then((r) => r.data),
+    member: (login: string) =>
+      get<{ data: LeetcodeMemberStats }>(`/v1/leetcode/${login}`).then((r) => r.data),
+  },
+};
+
+export type LeetcodeLeaderboardEntry = {
+  rank: number;
+  login: string;
+  displayName: string;
+  avatar: string | null;
+  handle: string;
+  totalSolved: number;
+  easy: number;
+  medium: number;
+  hard: number;
+  ranking: number | null;
+  contestRating: number | null;
+  contestAttended: number;
+  streak: number;
+  totalActiveDays: number;
+  weighted: number;
+  fetchedAt: string;
+  lastError: string | null;
+};
+
+export type LeetcodeMemberStats = {
+  login: string;
+  displayName: string;
+  avatar: string | null;
+  handle: string;
+  totalSolved: number;
+  easy: number;
+  medium: number;
+  hard: number;
+  totalEasy: number;
+  totalMedium: number;
+  totalHard: number;
+  ranking: number | null;
+  reputation: number;
+  contestRating: number | null;
+  contestGlobalRanking: number | null;
+  contestAttended: number;
+  streak: number;
+  totalActiveDays: number;
+  submissionCalendar: Record<string, number>;
+  languageStats: Array<{ languageName: string; problemsSolved: number }>;
+  weighted: number;
+  fetchedAt: string;
+  lastError: string | null;
 };

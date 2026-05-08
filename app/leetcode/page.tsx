@@ -34,15 +34,15 @@ export default async function LeetcodePage() {
           <div className="live-head">
             <span className="eyebrow">
               <span className="dot" />
-              LeetCode · self-hosted
+              LeetCode
             </span>
             <h1>
               Five engineers <span className="accent">grinding problems</span>.
             </h1>
             <p className="lede">
-              Profile + contest stats from{" "}
-              <a href="https://leetcode.com/" target="_blank" rel="noreferrer">leetcode.com</a>{" "}
-              refreshed every six hours by Pulse. Weighted score = easy×1 + medium×2 + hard×4.
+              Problem-solving stats and contest history from{" "}
+              <a href="https://leetcode.com/" target="_blank" rel="noreferrer">leetcode.com</a>.
+              Weighted score = easy×1 + medium×2 + hard×4.
             </p>
           </div>
 

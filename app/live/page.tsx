@@ -56,6 +56,11 @@ export default async function LivePage() {
               </code>
             </pre>
           </details>
+
+          <p className="live-aside">
+            Curious how we sharpen the saw?{" "}
+            <Link href="/leetcode/">See the LeetCode leaderboard →</Link>
+          </p>
         </section>
       </main>
 

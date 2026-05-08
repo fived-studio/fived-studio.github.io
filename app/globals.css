@@ -1356,19 +1356,32 @@ footer {
 
 .lc-heatmap-list {
   display: grid;
-  gap: 24px;
+  gap: 20px;
 }
 
 .lc-heatmap-card {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 20px;
+}
+
+/* When wrapped in a card, the heatmap doesn't need its own border */
+.lc-heatmap-card .lc-heatmap {
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .lc-heatmap-cardhead {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .lc-heatmap-cardhead a {
@@ -1398,8 +1411,25 @@ footer {
   align-items: center;
 }
 
-.lc-badges-compact {
-  margin-top: 12px;
+.lc-badges-compact-wrap {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.lc-badges-compact-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-bright);
+  margin: 0 0 10px;
+  letter-spacing: -0.2px;
+}
+
+.lc-badges-compact-title .muted {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--text-mute);
 }
 
 .lc-badge {

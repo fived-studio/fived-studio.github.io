@@ -28,13 +28,18 @@ export default function LeetcodeBadges({ badges, variant = "compact", limit }: P
     const list = limit != null ? sorted.slice(0, limit) : sorted;
     const hidden = limit != null ? Math.max(0, sorted.length - limit) : 0;
     return (
-      <div className="lc-badges lc-badges-compact" aria-label={`${sorted.length} badges`}>
-        {list.map((b) => (
-          <span key={b.id} className="lc-badge" title={`${b.name} · ${b.creationDate}`}>
-            <img src={b.icon} alt={b.name} loading="lazy" />
-          </span>
-        ))}
-        {hidden > 0 && <span className="lc-badge-more">+{hidden}</span>}
+      <div className="lc-badges-compact-wrap">
+        <h4 className="lc-badges-compact-title">
+          Badges <span className="muted">· {sorted.length}</span>
+        </h4>
+        <div className="lc-badges" aria-label={`${sorted.length} badges`}>
+          {list.map((b) => (
+            <span key={b.id} className="lc-badge" title={`${b.name} · ${b.creationDate}`}>
+              <img src={b.icon} alt={b.name} loading="lazy" />
+            </span>
+          ))}
+          {hidden > 0 && <span className="lc-badge-more">+{hidden}</span>}
+        </div>
       </div>
     );
   }

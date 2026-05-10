@@ -121,7 +121,7 @@ export default async function LeetcodePage() {
                         </span>
                       </div>
                     </header>
-                    <LeetcodeHeatmap calendar={stat.submissionCalendar ?? {}} />
+                    <LeetcodeHeatmap calendar={stat.submissionCalendar ?? {}} days={730} />
                     <LeetcodeBadges badges={stat.badges} variant="compact" limit={20} />
                   </article>
                 );

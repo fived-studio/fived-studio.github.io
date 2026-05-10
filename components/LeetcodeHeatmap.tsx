@@ -11,6 +11,14 @@ const GAP = 3;
 const ROWS = 7;
 const MONTH_LABEL_H = 18;
 
+function windowText(days: number, override?: string): string {
+  if (override) return override;
+  if (days < 365) return `${days} days`;
+  const years = Math.round(days / 365);
+  if (years === 1) return "year";
+  return `${years} years`;
+}
+
 type Props = {
   calendar: Record<string, number>;
   endDate?: Date; // defaults to today
@@ -103,8 +111,7 @@ export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 
     <div className="lc-heatmap">
       <div className="lc-heatmap-head">
         <div className="lc-heatmap-stats">
-          <strong>{totalSubmissions}</strong> submissions in the past{" "}
-          {windowLabel ?? `${daysWindow >= 365 ? `${Math.round(daysWindow / 365)} year${daysWindow >= 730 ? "s" : ""}` : `${daysWindow} days`}`}
+          <strong>{totalSubmissions}</strong> submissions in the past {windowText(daysWindow, windowLabel)}
         </div>
         <div className="lc-heatmap-meta">
           <span>Total active days: <strong>{activeDays}</strong></span>
@@ -118,7 +125,7 @@ export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 
           width={width}
           height={height}
           viewBox={`0 0 ${width} ${height}`}
-          aria-label={`${totalSubmissions} submissions in the past year`}
+          aria-label={`${totalSubmissions} submissions in the past ${windowText(daysWindow, windowLabel)}`}
         >
           {monthLabels.map((m) => (
             <text

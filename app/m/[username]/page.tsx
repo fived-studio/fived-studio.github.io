@@ -11,8 +11,8 @@ import { pulse, type ActivityEvent, type LeetcodeMemberStats } from "~/lib/api";
 // roster here. Activity itself is fetched live per page.
 const ROSTER = {
   hgbaooo: { name: "Huỳnh Gia Bảo", role: "Fullstack Engineer" },
-  nquynqthanq: { name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX" },
-  thvnhtai: { name: "Nguyễn Thành Tài", role: "Frontend · UI/UX" },
+  nquynqthanq: { name: "Nguyễn Quốc Thắng", role: "Fullstack Engineer" },
+  thvnhtai: { name: "Nguyễn Thành Tài", role: "Fullstack Engineer" },
   sloweyyy: { name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
   TrTueTah: { name: "Trần Tuệ Tánh", role: "Fullstack Engineer" },
 } as const;
@@ -181,7 +181,7 @@ export default async function MemberPage({
               </div>
             </div>
 
-            <LeetcodeHeatmap calendar={leetcode.submissionCalendar ?? {}} />
+            <LeetcodeHeatmap calendar={leetcode.submissionCalendar ?? {}} days={730} />
 
             {leetcode.badges && leetcode.badges.length > 0 && (
               <div className="lc-badges-section">

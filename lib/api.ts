@@ -38,29 +38,47 @@ export type Totals = {
   activeMembers: number;
 };
 
+// In-process cache shared across page renders during the static build.
+// Key: full URL. Value: in-flight Promise (for coalescing) and resolved JSON.
+// During `bun run dev` and runtime, this is harmless because each fetch
+// still happens on first hit. The win is at build time: /leetcode pulls
+// every member's calendar, and /m/:login reuses the same data without
+// re-hitting Cloud Run.
+const _cache = new Map<string, Promise<unknown>>();
+
 async function get<T>(path: string, init?: RequestInit): Promise<T> {
-  // No-store: pages re-fetch fresh on every navigation. We're a static export,
-  // so Next's revalidate hint is ignored — caching belongs to the browser.
-  // Build-time renders fan ~15 parallel requests at the API; Cloud Run
-  // occasionally 5xx's under that burst, so retry transient failures with
-  // a brief backoff before giving up.
   const url = `${BASE}${path}`;
-  let lastErr: unknown;
-  for (let i = 0; i < 4; i++) {
-    try {
-      const res = await fetch(url, { cache: "no-store", ...init });
-      if (res.ok) return (await res.json()) as T;
-      if (res.status >= 500 || res.status === 429) {
-        lastErr = new Error(`pulse api ${path} → ${res.status}`);
-      } else {
-        throw new Error(`pulse api ${path} → ${res.status}`);
+
+  const cached = _cache.get(url);
+  if (cached) return cached as Promise<T>;
+
+  const promise = (async () => {
+    let lastErr: unknown;
+    // 8 attempts with capped exponential backoff (max ~3s wait) — Cloud Run
+    // autoscaler occasionally 500s when the build fans many requests.
+    for (let i = 0; i < 8; i++) {
+      try {
+        const res = await fetch(url, { cache: "no-store", ...init });
+        if (res.ok) return (await res.json()) as T;
+        if (res.status >= 500 || res.status === 429) {
+          lastErr = new Error(`pulse api ${path} → ${res.status}`);
+        } else {
+          throw new Error(`pulse api ${path} → ${res.status}`);
+        }
+      } catch (err) {
+        lastErr = err;
       }
-    } catch (err) {
-      lastErr = err;
+      const delay = Math.min(3000, 300 * 2 ** i) + Math.random() * 250;
+      await new Promise((r) => setTimeout(r, delay));
     }
-    await new Promise((r) => setTimeout(r, 400 * (i + 1) + Math.random() * 200));
-  }
-  throw lastErr ?? new Error(`pulse api ${path} → unknown`);
+    throw lastErr ?? new Error(`pulse api ${path} → unknown`);
+  })();
+
+  _cache.set(url, promise);
+  // Drop failed entries so a subsequent retry inside the same build can
+  // try again rather than inheriting the rejection forever.
+  promise.catch(() => _cache.delete(url));
+  return promise as Promise<T>;
 }
 
 export const pulse = {
@@ -87,6 +105,9 @@ export const pulse = {
       get<{ data: { sort: string; count: number; leaderboard: LeetcodeLeaderboardEntry[] } }>(
         `/v1/leetcode/leaderboard?sort=${sort}`,
       ).then((r) => r.data),
+    /** Bulk: full snapshot (incl. calendar + badges) for every member with a handle. */
+    all: () =>
+      get<{ data: LeetcodeMemberStats[] }>(`/v1/leetcode/all`).then((r) => r.data),
     member: (login: string) =>
       get<{ data: LeetcodeMemberStats }>(`/v1/leetcode/${login}`).then((r) => r.data),
   },

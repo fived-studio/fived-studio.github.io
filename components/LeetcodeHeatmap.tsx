@@ -1,78 +1,99 @@
+"use client";
+
 /**
- * LeetCode-style submission heatmap — past 365 days ending today.
+ * LeetCode-style submission heatmap with a year selector.
  *
- * Server-rendered SVG. Calendar input is the raw map from LeetCode's
+ * Calendar input is the raw map from LeetCode's
  * userCalendar.submissionCalendar (UNIX-seconds string keys → submission
- * count). We render 7 rows × ~53 columns; opacity scales with intensity.
+ * count). The component derives which calendar years exist in the data
+ * and renders a "Current ▾" dropdown matching LeetCode's profile UX:
+ *   - "Current"  → rolling 365 days ending today
+ *   - 2025 / 2024 / ... → that calendar year, Jan 1 → Dec 31
+ *
+ * Single-year render is always ≤53 weeks wide so the card never overflows.
  */
+
+import { useMemo, useState } from "react";
 
 const CELL = 12;
 const GAP = 3;
 const ROWS = 7;
 const MONTH_LABEL_H = 18;
 
-function windowText(days: number, override?: string): string {
-  if (override) return override;
-  if (days < 365) return `${days} days`;
-  const years = Math.round(days / 365);
-  if (years === 1) return "year";
-  return `${years} years`;
-}
+type View =
+  | { kind: "current" }
+  | { kind: "year"; year: number };
 
 type Props = {
   calendar: Record<string, number>;
-  endDate?: Date; // defaults to today
-  /** How many days back from endDate to render. Defaults to 365 (1 year). */
-  days?: number;
-  /** Override the header copy when rendering a window other than 1 year. */
-  windowLabel?: string;
+  /** Initial selection. Defaults to "current" (rolling 365 days). */
+  initialView?: View;
 };
 
-export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 365, windowLabel }: Props) {
-  const end = endDate ?? new Date();
-  // anchor end at UTC midnight so cell keys line up with LeetCode's own keys
-  const today = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()));
+export default function LeetcodeHeatmap({ calendar, initialView }: Props) {
+  // Years present in the data, newest first. Derived once per mount.
+  const years = useMemo(() => {
+    const set = new Set<number>();
+    for (const k of Object.keys(calendar)) {
+      const ts = Number(k);
+      if (!Number.isFinite(ts)) continue;
+      set.add(new Date(ts * 1000).getUTCFullYear());
+    }
+    return [...set].sort((a, b) => b - a);
+  }, [calendar]);
 
-  // Build an ordered list of cells ending today, snapped to clean
-  // Sunday-start weeks for the column layout.
-  const days: Array<{ date: Date; count: number }> = [];
-  const totalDays = daysWindow;
-  // Walk back 365 days, then snap forward so the first day is a Sunday.
-  const start = new Date(today);
-  start.setUTCDate(start.getUTCDate() - (totalDays - 1));
-  // Snap start back to the prior Sunday so columns are clean weeks.
-  const startWeekday = start.getUTCDay(); // 0=Sun..6=Sat
-  start.setUTCDate(start.getUTCDate() - startWeekday);
+  const [view, setView] = useState<View>(initialView ?? { kind: "current" });
 
-  // Build until we're past today (inclusive)
-  for (let d = new Date(start); d <= today; d.setUTCDate(d.getUTCDate() + 1)) {
-    const epoch = Math.floor(d.getTime() / 1000).toString();
-    const count = calendar[epoch] ?? 0;
-    days.push({ date: new Date(d), count });
-  }
+  // Compute the day window for the selected view.
+  const { rangeStart, rangeEnd, label } = useMemo(() => {
+    if (view.kind === "current") {
+      const t = new Date();
+      const end = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()));
+      const start = new Date(end);
+      start.setUTCDate(start.getUTCDate() - 364);
+      return { rangeStart: start, rangeEnd: end, label: "past year" };
+    }
+    const start = new Date(Date.UTC(view.year, 0, 1));
+    const end = new Date(Date.UTC(view.year, 11, 31));
+    return { rangeStart: start, rangeEnd: end, label: view.year.toString() };
+  }, [view]);
 
-  // Pad to a clean grid (multiple of 7) — append future days as zero so the
-  // last column always has 7 rows. They render but fall in the future-mask.
-  while (days.length % 7 !== 0) {
-    const last = days[days.length - 1]!.date;
-    const next = new Date(last);
-    next.setUTCDate(next.getUTCDate() + 1);
-    days.push({ date: next, count: 0 });
-  }
+  // Build the day grid, snapped to clean Sunday-start weeks.
+  const cells = useMemo(() => {
+    const arr: Array<{ date: Date; count: number; inRange: boolean }> = [];
+    const start = new Date(rangeStart);
+    const startWeekday = start.getUTCDay();
+    start.setUTCDate(start.getUTCDate() - startWeekday);
+    for (let d = new Date(start); d <= rangeEnd; d.setUTCDate(d.getUTCDate() + 1)) {
+      const epoch = Math.floor(d.getTime() / 1000).toString();
+      arr.push({
+        date: new Date(d),
+        count: calendar[epoch] ?? 0,
+        inRange: d >= rangeStart && d <= rangeEnd,
+      });
+    }
+    while (arr.length % 7 !== 0) {
+      const last = arr[arr.length - 1]!.date;
+      const next = new Date(last);
+      next.setUTCDate(next.getUTCDate() + 1);
+      arr.push({ date: next, count: 0, inRange: false });
+    }
+    return arr;
+  }, [calendar, rangeStart, rangeEnd]);
 
-  const weeks = days.length / 7;
+  const weeks = cells.length / 7;
   const width = weeks * (CELL + GAP);
   const height = ROWS * (CELL + GAP) + MONTH_LABEL_H;
 
-  // Stats: totals over the visible window, only counting cells <= today
-  const visible = days.filter((d) => d.date <= today);
-  const totalSubmissions = visible.reduce((sum, d) => sum + d.count, 0);
-  const activeDays = visible.filter((d) => d.count > 0).length;
+  // Stats — only count cells that are actually in the selected range.
+  const visible = cells.filter((c) => c.inRange);
+  const totalSubmissions = visible.reduce((s, c) => s + c.count, 0);
+  const activeDays = visible.filter((c) => c.count > 0).length;
   const maxStreak = (() => {
     let best = 0;
     let cur = 0;
-    for (const d of visible) {
-      if (d.count > 0) {
+    for (const c of visible) {
+      if (c.count > 0) {
         cur += 1;
         if (cur > best) best = cur;
       } else {
@@ -82,7 +103,6 @@ export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 
     return best;
   })();
 
-  // Intensity scale: 0, 1, 2-3, 4-7, 8+ → alpha 0/0.25/0.5/0.75/1
   const intensity = (n: number): number => {
     if (n <= 0) return 0;
     if (n === 1) return 0.3;
@@ -91,11 +111,11 @@ export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 
     return 1;
   };
 
-  // Month labels — emit a label at the column of the first cell of each month
+  // Month labels at first cell-column of each new month.
   const monthLabels: Array<{ x: number; label: string }> = [];
   let lastMonth = -1;
   for (let w = 0; w < weeks; w++) {
-    const firstCell = days[w * 7];
+    const firstCell = cells[w * 7];
     if (!firstCell) continue;
     const m = firstCell.date.getUTCMonth();
     if (m !== lastMonth) {
@@ -107,15 +127,31 @@ export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 
     }
   }
 
+  const selectedValue = view.kind === "current" ? "current" : view.year.toString();
+
   return (
     <div className="lc-heatmap">
       <div className="lc-heatmap-head">
         <div className="lc-heatmap-stats">
-          <strong>{totalSubmissions}</strong> submissions in the past {windowText(daysWindow, windowLabel)}
+          <strong>{totalSubmissions}</strong> submissions in the {label}
         </div>
         <div className="lc-heatmap-meta">
           <span>Total active days: <strong>{activeDays}</strong></span>
           <span>Max streak: <strong>{maxStreak}</strong></span>
+          <select
+            className="lc-heatmap-year"
+            value={selectedValue}
+            onChange={(e) => {
+              const v = e.target.value;
+              setView(v === "current" ? { kind: "current" } : { kind: "year", year: Number(v) });
+            }}
+            aria-label="Select year"
+          >
+            <option value="current">Current</option>
+            {years.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -125,7 +161,7 @@ export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 
           width={width}
           height={height}
           viewBox={`0 0 ${width} ${height}`}
-          aria-label={`${totalSubmissions} submissions in the past ${windowText(daysWindow, windowLabel)}`}
+          aria-label={`${totalSubmissions} submissions in the ${label}`}
         >
           {monthLabels.map((m) => (
             <text
@@ -140,21 +176,20 @@ export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 
             </text>
           ))}
 
-          {days.map((d, i) => {
+          {cells.map((c, i) => {
             const col = Math.floor(i / 7);
             const row = i % 7;
-            const isFuture = d.date > today;
-            const a = intensity(d.count);
+            const a = intensity(c.count);
             const fill =
-              isFuture
+              !c.inRange
                 ? "transparent"
                 : a === 0
                   ? "var(--lc-empty, #1f2024)"
                   : `rgba(0, 217, 146, ${a})`;
-            const stroke = a === 0 && !isFuture ? "var(--lc-empty-stroke, #2a2c30)" : "transparent";
-            const title = isFuture
-              ? d.date.toUTCString()
-              : `${d.count} submission${d.count === 1 ? "" : "s"} on ${d.date.toLocaleDateString(
+            const stroke = a === 0 && c.inRange ? "var(--lc-empty-stroke, #2a2c30)" : "transparent";
+            const title = !c.inRange
+              ? c.date.toUTCString()
+              : `${c.count} submission${c.count === 1 ? "" : "s"} on ${c.date.toLocaleDateString(
                   "en",
                   { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" },
                 )}`;

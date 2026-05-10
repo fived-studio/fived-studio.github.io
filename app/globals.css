@@ -1441,6 +1441,53 @@ footer {
   border-radius: var(--r-button);
   background: var(--surface-hi);
   border: 1px solid var(--border);
+  position: relative;
+}
+
+/* CSS-only tooltip for compact badge icons. Native HTML title="" has a
+   browser-imposed ~1-2s hover delay; this fires within ~80ms and matches
+   the rest of the carbon canvas. */
+.lc-badge-tip::after,
+.lc-badge-tip::before {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 80ms ease-out 80ms;
+  z-index: 10;
+}
+
+.lc-badge-tip::after {
+  content: attr(data-tip);
+  white-space: nowrap;
+  background: var(--surface-hi);
+  color: var(--text-bright);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-button);
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: -0.1px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.lc-badge-tip::before {
+  content: "";
+  bottom: calc(100% + 2px);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--border-hi);
+}
+
+.lc-badge-tip:hover::after,
+.lc-badge-tip:hover::before,
+.lc-badge-tip:focus-visible::after,
+.lc-badge-tip:focus-visible::before {
+  opacity: 1;
 }
 
 .lc-badge img {

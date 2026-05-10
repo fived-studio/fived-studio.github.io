@@ -34,7 +34,11 @@ export default function LeetcodeBadges({ badges, variant = "compact", limit }: P
         </h4>
         <div className="lc-badges" aria-label={`${sorted.length} badges`}>
           {list.map((b) => (
-            <span key={b.id} className="lc-badge" title={`${b.name} · ${b.creationDate}`}>
+            <span
+              key={b.id}
+              className="lc-badge lc-badge-tip"
+              data-tip={`${b.name} · ${b.creationDate}`}
+            >
               <img src={b.icon} alt={b.name} loading="lazy" />
             </span>
           ))}
@@ -68,7 +72,7 @@ export default function LeetcodeBadges({ badges, variant = "compact", limit }: P
           </h4>
           <div className="lc-badges">
             {groups.get(cat)!.map((b) => (
-              <span key={b.id} className="lc-badge lc-badge-tile" title={`${b.name} · ${b.creationDate}`}>
+              <span key={b.id} className="lc-badge lc-badge-tile">
                 <img src={b.icon} alt={b.name} loading="lazy" />
                 <span className="lc-badge-name">{b.name}</span>
                 <span className="lc-badge-date">{b.creationDate}</span>

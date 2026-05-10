@@ -14,17 +14,21 @@ const MONTH_LABEL_H = 18;
 type Props = {
   calendar: Record<string, number>;
   endDate?: Date; // defaults to today
+  /** How many days back from endDate to render. Defaults to 365 (1 year). */
+  days?: number;
+  /** Override the header copy when rendering a window other than 1 year. */
+  windowLabel?: string;
 };
 
-export default function LeetcodeHeatmap({ calendar, endDate }: Props) {
+export default function LeetcodeHeatmap({ calendar, endDate, days: daysWindow = 365, windowLabel }: Props) {
   const end = endDate ?? new Date();
   // anchor end at UTC midnight so cell keys line up with LeetCode's own keys
   const today = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()));
 
-  // Build an ordered list of 365 day cells, ending today, ending the last
-  // column on Saturday so the last partial week sits on the right.
+  // Build an ordered list of cells ending today, snapped to clean
+  // Sunday-start weeks for the column layout.
   const days: Array<{ date: Date; count: number }> = [];
-  const totalDays = 365;
+  const totalDays = daysWindow;
   // Walk back 365 days, then snap forward so the first day is a Sunday.
   const start = new Date(today);
   start.setUTCDate(start.getUTCDate() - (totalDays - 1));
@@ -99,7 +103,8 @@ export default function LeetcodeHeatmap({ calendar, endDate }: Props) {
     <div className="lc-heatmap">
       <div className="lc-heatmap-head">
         <div className="lc-heatmap-stats">
-          <strong>{totalSubmissions}</strong> submissions in the past one year
+          <strong>{totalSubmissions}</strong> submissions in the past{" "}
+          {windowLabel ?? `${daysWindow >= 365 ? `${Math.round(daysWindow / 365)} year${daysWindow >= 730 ? "s" : ""}` : `${daysWindow} days`}`}
         </div>
         <div className="lc-heatmap-meta">
           <span>Total active days: <strong>{activeDays}</strong></span>

@@ -34,14 +34,17 @@ export default async function MemberPage({
   if (!(username in ROSTER)) notFound();
   const fallback = ROSTER[username as Username];
 
-  const [profile, eventsRes, leetcode] = await Promise.all([
+  const [profile, eventsRes, allLeetcode] = await Promise.all([
     pulse.member(username).catch(() => null),
     pulse.events(20, username).catch(() => ({
       data: [] as ActivityEvent[],
       nextBefore: null as string | null,
     })),
-    pulse.leetcode.member(username).catch(() => null as LeetcodeMemberStats | null),
+    // Single bulk call shared with /leetcode via the api client cache —
+    // dramatically more reliable than per-member fetches at build time.
+    pulse.leetcode.all().catch(() => [] as LeetcodeMemberStats[]),
   ]);
+  const leetcode = allLeetcode.find((s) => s.login === username) ?? null;
   const events = eventsRes.data;
 
   const name = profile?.name ?? fallback.name;
@@ -181,7 +184,7 @@ export default async function MemberPage({
               </div>
             </div>
 
-            <LeetcodeHeatmap calendar={leetcode.submissionCalendar ?? {}} days={730} />
+            <LeetcodeHeatmap calendar={leetcode.submissionCalendar ?? {}} />
 
             {leetcode.badges && leetcode.badges.length > 0 && (
               <div className="lc-badges-section">

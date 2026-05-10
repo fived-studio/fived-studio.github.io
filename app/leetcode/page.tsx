@@ -12,17 +12,19 @@ export const metadata = {
 export const dynamic = "force-static";
 
 export default async function LeetcodePage() {
+  // One bulk call → 5x the cost saved vs hitting /v1/leetcode/:login per member.
+  // The api client memoises on URL so /m/:login also reads from this same hit.
+  const all = await pulse.leetcode.all().catch(() => [] as LeetcodeMemberStats[]);
+
   const board = await pulse.leetcode.leaderboard("weighted").catch(() => ({
     sort: "weighted",
     count: 0,
     leaderboard: [] as LeetcodeLeaderboardEntry[],
   }));
 
-  // Hydrate per-member calendar in parallel for the heatmaps section.
-  const stats = await Promise.all(
-    board.leaderboard.map((row) =>
-      pulse.leetcode.member(row.login).catch(() => null as LeetcodeMemberStats | null),
-    ),
+  const byLogin = new Map(all.map((s) => [s.login, s]));
+  const stats: Array<LeetcodeMemberStats | null> = board.leaderboard.map(
+    (row) => byLogin.get(row.login) ?? null,
   );
 
   return (
@@ -98,7 +100,7 @@ export default async function LeetcodePage() {
 
         {stats.some(Boolean) && (
           <section className="section" style={{ paddingTop: 0 }}>
-            <h2 className="lc-section-title">Submission heatmaps · past year</h2>
+            <h2 className="lc-section-title">Submission heatmaps</h2>
             <div className="lc-heatmap-list">
               {stats.filter(Boolean).map((s) => {
                 const stat = s!;
@@ -121,7 +123,7 @@ export default async function LeetcodePage() {
                         </span>
                       </div>
                     </header>
-                    <LeetcodeHeatmap calendar={stat.submissionCalendar ?? {}} days={730} />
+                    <LeetcodeHeatmap calendar={stat.submissionCalendar ?? {}} />
                     <LeetcodeBadges badges={stat.badges} variant="compact" limit={20} />
                   </article>
                 );

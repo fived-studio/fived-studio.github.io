@@ -1323,6 +1323,36 @@ footer {
   margin-left: 2px;
 }
 
+.lc-heatmap-year {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface-hi);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--r-button);
+  padding: 4px 26px 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-mute) 50%),
+                    linear-gradient(135deg, var(--text-mute) 50%, transparent 50%);
+  background-position: calc(100% - 12px) center, calc(100% - 7px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border-color 120ms ease;
+}
+
+.lc-heatmap-year:hover,
+.lc-heatmap-year:focus {
+  border-color: var(--border-hi);
+  outline: none;
+}
+
+.lc-heatmap-year option {
+  background: var(--surface-hi);
+  color: var(--text);
+}
+
 .lc-heatmap-scroll {
   overflow-x: auto;
   padding-bottom: 4px;

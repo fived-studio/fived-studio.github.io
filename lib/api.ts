@@ -41,9 +41,26 @@ export type Totals = {
 async function get<T>(path: string, init?: RequestInit): Promise<T> {
   // No-store: pages re-fetch fresh on every navigation. We're a static export,
   // so Next's revalidate hint is ignored — caching belongs to the browser.
-  const res = await fetch(`${BASE}${path}`, { cache: "no-store", ...init });
-  if (!res.ok) throw new Error(`pulse api ${path} → ${res.status}`);
-  return (await res.json()) as T;
+  // Build-time renders fan ~15 parallel requests at the API; Cloud Run
+  // occasionally 5xx's under that burst, so retry transient failures with
+  // a brief backoff before giving up.
+  const url = `${BASE}${path}`;
+  let lastErr: unknown;
+  for (let i = 0; i < 4; i++) {
+    try {
+      const res = await fetch(url, { cache: "no-store", ...init });
+      if (res.ok) return (await res.json()) as T;
+      if (res.status >= 500 || res.status === 429) {
+        lastErr = new Error(`pulse api ${path} → ${res.status}`);
+      } else {
+        throw new Error(`pulse api ${path} → ${res.status}`);
+      }
+    } catch (err) {
+      lastErr = err;
+    }
+    await new Promise((r) => setTimeout(r, 400 * (i + 1) + Math.random() * 200));
+  }
+  throw lastErr ?? new Error(`pulse api ${path} → unknown`);
 }
 
 export const pulse = {

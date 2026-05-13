@@ -11,7 +11,7 @@ const FALLBACK_MEMBERS: Member[] = [
   { login: "sloweyyy", name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack", avatarUrl: null },
   {
     login: "slowey-katalon",
-    name: "Phuc Truong",
+    name: "Trương Lê Vĩnh Phúc",
     role: "Product · DevOps · Fullstack",
     avatarUrl: null,
   },

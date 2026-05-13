@@ -14,7 +14,7 @@ const ROSTER = {
   nquynqthanq: { name: "Nguyễn Quốc Thắng", role: "Fullstack Engineer" },
   thvnhtai: { name: "Nguyễn Thành Tài", role: "Fullstack Engineer" },
   sloweyyy: { name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
-  "slowey-katalon": { name: "Phuc Truong", role: "Product · DevOps · Fullstack" },
+  "slowey-katalon": { name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
   TrTueTah: { name: "Trần Tuệ Tánh", role: "Fullstack Engineer" },
 } as const;
 

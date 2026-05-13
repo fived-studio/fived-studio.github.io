@@ -1,4 +1,6 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { pulse } from "~/lib/api";
 
 const ROSTER: Record<string, { name: string; role: string }> = {
@@ -19,6 +21,10 @@ export function generateStaticParams() {
   return Object.keys(ROSTER).map((username) => ({ username }));
 }
 
+async function loadFont(file: string) {
+  return readFile(path.join(process.cwd(), "public/fonts", file));
+}
+
 export default async function OG({
   params,
 }: {
@@ -27,10 +33,17 @@ export default async function OG({
   const { username } = params;
   const fallback = ROSTER[username] ?? { name: username, role: "Engineer" };
 
-  const [profile, totals] = await Promise.all([
-    pulse.member(username).catch(() => null),
-    pulse.totals(30, username).catch(() => null),
-  ]);
+  // Fonts are bundled locally so the build never reaches out to Google Fonts
+  // at render time. Without this, satori auto-fetches a glyph subset for any
+  // non-ASCII characters (Vietnamese names) and the runner hangs on ETIMEDOUT.
+  const [profile, totals, bodyRegular, bodySemiBold, mono] =
+    await Promise.all([
+      pulse.member(username).catch(() => null),
+      pulse.totals(30, username).catch(() => null),
+      loadFont("BeVietnamPro-Regular.ttf"),
+      loadFont("BeVietnamPro-SemiBold.ttf"),
+      loadFont("JetBrainsMono-Regular.ttf"),
+    ]);
 
   const name = profile?.name ?? fallback.name;
   const role = profile?.role ?? fallback.role;
@@ -48,7 +61,7 @@ export default async function OG({
           display: "flex",
           flexDirection: "column",
           padding: 80,
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "Be Vietnam Pro",
         }}
       >
         <div
@@ -71,7 +84,7 @@ export default async function OG({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontFamily: "monospace",
+              fontFamily: "JetBrains Mono",
               fontWeight: 700,
               fontSize: 24,
               color: "#00d992",
@@ -119,7 +132,7 @@ export default async function OG({
               style={{
                 fontSize: 22,
                 color: "#00d992",
-                fontFamily: "monospace",
+                fontFamily: "JetBrains Mono",
                 marginTop: 4,
               }}
             >
@@ -147,7 +160,14 @@ export default async function OG({
         </div>
       </div>
     ),
-    { ...size },
+    {
+      ...size,
+      fonts: [
+        { name: "Be Vietnam Pro", data: bodyRegular, weight: 400, style: "normal" },
+        { name: "Be Vietnam Pro", data: bodySemiBold, weight: 600, style: "normal" },
+        { name: "JetBrains Mono", data: mono, weight: 400, style: "normal" },
+      ],
+    },
   );
 }
 
@@ -156,7 +176,7 @@ function Stat({ value, label }: { value: string; label: string }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
       <span
         style={{
-          fontFamily: "monospace",
+          fontFamily: "JetBrains Mono",
           fontSize: 48,
           color: "#00d992",
           lineHeight: 1,

@@ -710,6 +710,12 @@ footer {
   border-color: var(--accent);
   color: var(--accent);
 }
+.live-filter-reveal {
+  min-width: 32px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
 
 /* ---------- /live page ---------- */
 .live-section {
@@ -825,6 +831,58 @@ footer {
   padding: 8px 0;
   font-style: italic;
   color: var(--text-mute);
+}
+.live-secret-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 6, 10, 0.72);
+  padding: 20px;
+}
+.live-secret-modal {
+  width: min(420px, 100%);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 20px;
+}
+.live-secret-modal h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.live-secret-modal p {
+  margin: 0 0 14px;
+  color: var(--text-mute);
+}
+.live-secret-modal input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface-hi);
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+.live-secret-modal input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.live-secret-error {
+  margin: 0 0 10px;
+  color: var(--danger);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+.live-secret-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 .live-curl {
   margin-top: 28px;

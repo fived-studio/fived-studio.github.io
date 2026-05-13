@@ -9,12 +9,6 @@ const FALLBACK_MEMBERS: Member[] = [
   { login: "nquynqthanq", name: "Nguyễn Quốc Thắng", role: "Fullstack Engineer", avatarUrl: null },
   { login: "thvnhtai", name: "Nguyễn Thành Tài", role: "Fullstack Engineer", avatarUrl: null },
   { login: "sloweyyy", name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack", avatarUrl: null },
-  {
-    login: "slowey-katalon",
-    name: "Trương Lê Vĩnh Phúc",
-    role: "Product · DevOps · Fullstack",
-    avatarUrl: null,
-  },
   { login: "TrTueTah", name: "Trần Tuệ Tánh", role: "Fullstack Engineer", avatarUrl: null },
 ];
 
@@ -25,7 +19,12 @@ export default async function Page() {
     pulse.members().catch(() => [] as Member[]),
     pulse.totals(30).catch(() => null),
   ]);
-  const members = apiMembers.length > 0 ? apiMembers : FALLBACK_MEMBERS;
+  // slowey-katalon is the same human as sloweyyy — keep the live profile
+  // route at /m/slowey-katalon, but don't show a duplicate card on the
+  // landing roster.
+  const members = (apiMembers.length > 0 ? apiMembers : FALLBACK_MEMBERS).filter(
+    (m) => m.login !== "slowey-katalon",
+  );
   return (
     <>
       <SiteHeader />

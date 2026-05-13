@@ -4,6 +4,17 @@ import LiveFeed from "~/components/LiveFeed";
 import LiveStats from "~/components/LiveStats";
 import SiteHeader from "~/components/SiteHeader";
 
+const PRIVATE_CANDIDATE_LOGINS = parseCsv(process.env.NEXT_PUBLIC_LIVE_PRIVATE_CANDIDATES);
+const PRIVATE_CANDIDATE_SECRET_HASH = process.env.NEXT_PUBLIC_LIVE_PRIVATE_SECRET_HASH ?? "";
+
+function parseCsv(value: string | undefined): string[] {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export const metadata = {
   title: "Live · FiveD Studio",
   description: "Real-time engineering activity across the FiveD Studio team.",
@@ -42,7 +53,12 @@ export default async function LivePage() {
 
           <LiveStats initial={totals} fallbackMembers={members.length} />
 
-          <LiveFeed initialEvents={events} members={members} />
+          <LiveFeed
+            initialEvents={events}
+            members={members}
+            privateCandidates={PRIVATE_CANDIDATE_LOGINS}
+            secretHash={PRIVATE_CANDIDATE_SECRET_HASH}
+          />
 
           <details className="live-curl">
             <summary>Stream it yourself</summary>

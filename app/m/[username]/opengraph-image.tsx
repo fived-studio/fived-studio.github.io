@@ -6,6 +6,7 @@ const ROSTER: Record<string, { name: string; role: string }> = {
   nquynqthanq: { name: "Nguyễn Quốc Thắng", role: "Frontend · UI/UX" },
   thvnhtai: { name: "Nguyễn Thành Tài", role: "Frontend · UI/UX" },
   sloweyyy: { name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
+  "slowey-katalon": { name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack" },
   TrTueTah: { name: "Trần Tuệ Tánh", role: "Fullstack Engineer" },
 };
 

@@ -9,7 +9,12 @@ const FALLBACK_MEMBERS: Member[] = [
   { login: "nquynqthanq", name: "Nguyễn Quốc Thắng", role: "Fullstack Engineer", avatarUrl: null },
   { login: "thvnhtai", name: "Nguyễn Thành Tài", role: "Fullstack Engineer", avatarUrl: null },
   { login: "sloweyyy", name: "Trương Lê Vĩnh Phúc", role: "Product · DevOps · Fullstack", avatarUrl: null },
-  { login: "slowey-katalon", name: "Slowey Katalon", role: "Engineer", avatarUrl: null },
+  {
+    login: "slowey-katalon",
+    name: "Phuc Truong",
+    role: "Product · DevOps · Fullstack",
+    avatarUrl: null,
+  },
   { login: "TrTueTah", name: "Trần Tuệ Tánh", role: "Fullstack Engineer", avatarUrl: null },
 ];
 

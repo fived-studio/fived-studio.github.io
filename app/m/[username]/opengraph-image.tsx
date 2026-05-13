@@ -47,6 +47,8 @@ export default async function OG({
 
   const name = profile?.name ?? fallback.name;
   const role = profile?.role ?? fallback.role;
+  const displayName = sanitizeForOGText(name);
+  const displayRole = sanitizeForOGText(role);
 
   return new ImageResponse(
     (
@@ -125,9 +127,9 @@ export default async function OG({
                 color: "#ffffff",
               }}
             >
-              {name}
+              {displayName}
             </div>
-            <div style={{ fontSize: 28, color: "#b8b3b0" }}>{role}</div>
+            <div style={{ fontSize: 28, color: "#b8b3b0" }}>{displayRole}</div>
             <div
               style={{
                 fontSize: 22,
@@ -169,6 +171,18 @@ export default async function OG({
       ],
     },
   );
+}
+
+/**
+ * Strip combining diacritical marks (U+0300-U+036F) and map Đ/đ to ASCII
+ * so Next.js OG generation does not trigger remote dynamic-font fetching.
+ */
+function sanitizeForOGText(value?: string | null) {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/Đ/g, "D")
+    .replace(/đ/g, "d");
 }
 
 function Stat({ value, label }: { value: string; label: string }) {

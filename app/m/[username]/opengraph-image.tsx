@@ -153,8 +153,12 @@ export default async function OG({
   );
 }
 
-function sanitizeForOGText(value: string) {
-  return value
+/**
+ * Strip combining diacritical marks (U+0300-U+036F) and map Đ/đ to ASCII
+ * so Next.js OG generation does not trigger remote dynamic-font fetching.
+ */
+function sanitizeForOGText(value?: string | null) {
+  return (value ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/Đ/g, "D")

@@ -21,12 +21,30 @@ export default function LiveFeed({ initialEvents, members, privateCandidates, se
   const [secretError, setSecretError] = useState("");
   const [isUnlocking, setIsUnlocking] = useState(false);
   const secretInputRef = useRef<HTMLInputElement>(null);
+  // Rehydrate from the API on mount: the page is statically exported, so the
+  // build-time snapshot can be empty if /v1/members flaked during CI.
+  const [liveMembers, setLiveMembers] = useState<Member[]>(members);
+
+  useEffect(() => {
+    let cancelled = false;
+    pulse
+      .members()
+      .then((rows) => {
+        if (!cancelled && rows.length > 0) setLiveMembers(rows);
+      })
+      .catch(() => {
+        /* keep build-time members */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const hasSecret = secretHash.trim().length > 0;
   const privateSet = hasSecret ? new Set(privateCandidates) : new Set<string>();
-  const publicMembers = members.filter((m) => !privateSet.has(m.login));
-  const privateMembers = members.filter((m) => privateSet.has(m.login));
-  const visibleMembers = showPrivate ? members : publicMembers;
+  const publicMembers = liveMembers.filter((m) => !privateSet.has(m.login));
+  const privateMembers = liveMembers.filter((m) => privateSet.has(m.login));
+  const visibleMembers = showPrivate ? liveMembers : publicMembers;
 
   const openSecretModal = () => {
     setSecretError("");

@@ -118,6 +118,12 @@ export default async function Page() {
               <p>Operations platform for resorts — guests, rooms, billing, admin.</p>
               <span className="card-link">RMS-BE →</span>
             </a>
+            <a className="card" href="https://github.com/fived-studio/repo-ranker" target="_blank" rel="noopener noreferrer">
+              <div className="card-icon">📊</div>
+              <h3>Repo Ranker</h3>
+              <p>Dashboard that ranks our GitHub repos by 14-day traffic, clones, stars, and activity.</p>
+              <span className="card-link">repo-ranker →</span>
+            </a>
           </div>
         </section>
 

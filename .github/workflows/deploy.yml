@@ -29,6 +29,8 @@ jobs:
       - run: bun run build
         env:
           NEXT_PUBLIC_PULSE_API: ${{ vars.PULSE_API_URL }}
+          NEXT_PUBLIC_LIVE_PRIVATE_CANDIDATES: ${{ vars.LIVE_PRIVATE_CANDIDATES }}
+          NEXT_PUBLIC_LIVE_PRIVATE_SECRET_HASH: ${{ secrets.LIVE_PRIVATE_SECRET_HASH }}
 
       - uses: actions/configure-pages@v5
 

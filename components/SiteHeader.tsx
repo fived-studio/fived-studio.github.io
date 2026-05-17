@@ -4,7 +4,6 @@ export default function SiteHeader() {
   return (
     <header className="nav">
       <Link href="/" className="brand">
-        <span className="logo">5D</span>
         <span className="brand-name">FiveD Studio</span>
       </Link>
       <nav>

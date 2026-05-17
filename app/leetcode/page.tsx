@@ -22,8 +22,20 @@ export default async function LeetcodePage() {
     leaderboard: [] as LeetcodeLeaderboardEntry[],
   }));
 
+  // A single LeetCode profile can be linked to more than one GitHub member
+  // (e.g. personal + work account). Collapse those to one leaderboard row and
+  // re-rank so positions stay sequential.
+  const seenHandles = new Set<string>();
+  const leaderboard = board.leaderboard
+    .filter((row) => {
+      if (seenHandles.has(row.handle)) return false;
+      seenHandles.add(row.handle);
+      return true;
+    })
+    .map((row, i) => ({ ...row, rank: i + 1 }));
+
   const byLogin = new Map(all.map((s) => [s.login, s]));
-  const stats: Array<LeetcodeMemberStats | null> = board.leaderboard.map(
+  const stats: Array<LeetcodeMemberStats | null> = leaderboard.map(
     (row) => byLogin.get(row.login) ?? null,
   );
 
@@ -48,7 +60,7 @@ export default async function LeetcodePage() {
             </p>
           </div>
 
-          {board.leaderboard.length === 0 ? (
+          {leaderboard.length === 0 ? (
             <p className="muted" style={{ marginTop: 24 }}>
               No LeetCode handles wired up yet. The Pulse worker will populate this on its next tick.
             </p>
@@ -65,7 +77,7 @@ export default async function LeetcodePage() {
                 <span className="lc-num">Contest</span>
                 <span className="lc-num">Streak</span>
               </div>
-              {board.leaderboard.map((row) => (
+              {leaderboard.map((row) => (
                 <Link
                   key={row.login}
                   href={`/m/${row.login}/`}
